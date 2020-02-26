@@ -9,35 +9,23 @@ import Switch from "@material-ui/core/Switch";
 import FormControlLabel from "@material-ui/core/FormControlLabel";
 import Typography from "@material-ui/core/Typography";
 import Select from "react-select";
-import DateFnsUtils from '@date-io/date-fns';
-import { MuiPickersUtilsProvider, DatePicker } from 'material-ui-pickers';
+
 
 const PaMasterCreateComponent = props => {
 
     const [status, setStatus] = useState(true);
-    const [error, setError] = useState("");
-    const [periode, setPeriode] = useState("");
-    const [semester, setSemester] = useState(null);
-    const [validFrom, setValidFrom] = useState(new Date())
-    const [validUntil, setValidUntil] = useState(new Date())
     const [withCustomAspek, setWithCustomAspek] = useState(false)
-
-    const semesterOptions = [
-        { value: 1, label: "Semester 1" },
-        { value: 2, label: "Semester 2" }
-    ];
     const [name, setName] = useState("");
     const [aspeks, setAspeks] = useState([]);
     const [dataAspek, setDataAspek] = useState([]);
     const [bobotAspek, setBobotAspek] = useState([]);
-
     const [dataSubAspek, setDataSubAspek] = useState([]);
     const [bobotSubAspek, setBobotSubAspek] = useState([]);
     const [dataUnsur, setDataUnsur] = useState([]);
     const [bobotUnsur, setBobotUnsur] = useState([]);
-
     const [bobotAtasan, setBobotAtasan] = useState(0);
     const [bobotBawahan, setBobotBawahan] = useState(0);
+    const [error, setError] = useState("");
 
     const { classes } = props;
 
@@ -65,7 +53,7 @@ const PaMasterCreateComponent = props => {
             const dataForSelect = response.data.map(aspek => ({
                 ...aspek,
                 value: aspek.id,
-                label: `${aspek.code} - ${aspek.name}`
+                label: `${aspek.code} - ${aspek.name} (${aspek.note})`
             }));
             setDataAspek(dataForSelect);
         }
@@ -115,8 +103,6 @@ const PaMasterCreateComponent = props => {
 
     const clear = () => {
         setStatus(true);
-        setPeriode("");
-        setName("");
     };
 
 
@@ -125,13 +111,7 @@ const PaMasterCreateComponent = props => {
         history.back();
     };
 
-    const handleFromDateChange = date => {
-        setValidFrom(date)
-    }
 
-    const handleUntilDateChange = date => {
-        setValidUntil(date)
-    }
 
     const bobotAtasanChange = e => {
         setBobotAtasan(e.target.value);
@@ -150,9 +130,7 @@ const PaMasterCreateComponent = props => {
     const withCustomAspekChange = e => {
         setWithCustomAspek(!withCustomAspek);
     };
-    const periodeChange = e => {
-        setPeriode(e.target.value);
-    };
+
     const nameChange = e => {
         setName(e.target.value);
     };
@@ -161,9 +139,7 @@ const PaMasterCreateComponent = props => {
         setAspeks(e);
     };
 
-    const semesterChange = e => {
-        setSemester(e);
-    };
+
 
     const bobotUnsurChange = (unsur_id, e) => {
         const newValue = parseInt(e.target.value);
@@ -237,15 +213,7 @@ const PaMasterCreateComponent = props => {
             inputValid = false; return
         }
 
-        if(periode.trim().length<1){
-            setError("Please fill the periode field");
-            inputValid = false; return
-        }
 
-        if(semester===null){
-            setError("Please select the semester");
-            inputValid = false; return
-        }
 
         if(bobotAtasan==0 || bobotBawahan==0){
             setError("Please specify bobot for leader or staff ");
@@ -292,13 +260,9 @@ const PaMasterCreateComponent = props => {
         if (aspeks.length > 0) {
             const params = {
                 aspek_ids: aspeks.map(a => a.value),
-                periode: periode,
                 bobot_atasan: bobotAtasan,
                 bobot_bawahan: bobotBawahan,
                 bobot_unsurs: bobotUnsur,
-                validFrom: validFrom,
-                validUntil: validUntil,
-                semester: semester.value,
                 name: name,
                 status: status == true ? 1 : 0,
                 creator: props.user.emp_id
@@ -335,46 +299,7 @@ const PaMasterCreateComponent = props => {
                 </Grid>
 
 
-                <Grid container>
-                    <TextField
-                        id="Periode"
-                        label="Periode"
-                        value={periode}
-                        margin="dense"
-                        variant="outlined"
-                        fullWidth
-                        onChange={periodeChange}
-                    />
-                </Grid>
-                <Grid item xs={12} className={classes.marginTops}>
-                    <Select
-                        value={semester}
-                        options={semesterOptions}
-                        onChange={semesterChange}
-                        placeholder="Select Semester"
-                        styles={selectCustomZindex}
-                    />
-                </Grid>
 
-                <MuiPickersUtilsProvider    utils={DateFnsUtils}>
-                    <Grid container justify="space-between">
-
-                        <DatePicker
-                            margin="normal"
-                            label="Valid From"
-                            value={validFrom}
-                            onChange={handleFromDateChange}
-                        />
-
-                        <DatePicker
-                            margin="normal"
-                            label="Valid Until"
-                            value={validUntil}
-                            onChange={handleUntilDateChange}
-                        />
-
-                    </Grid>
-                </MuiPickersUtilsProvider>
 
                 <Grid container justify="space-between" className={classes.marginTops}>
                     <Grid item xs={5}>

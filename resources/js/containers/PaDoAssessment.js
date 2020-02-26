@@ -56,7 +56,7 @@ const PaDoAssessmentComponent = props => {
         const oldUnsurScore = unsurScores.filter(u=>u.unsur_id === unsur_id)[0]
         const otherOldUnsurScore = unsurScores.filter(u=>u.unsur_id !== unsur_id)
 
-        const newScore = {...oldUnsurScore,atasan_score:scoreValue, atasanPercentScore:(scoreValue*oldUnsurScore.bobot/100)}
+        const newScore = {...oldUnsurScore, atasan_score:scoreValue, atasanPercentScore:(scoreValue*oldUnsurScore.bobot/100)}
         const newUnsurScores = [...otherOldUnsurScore, newScore]
         const sorted = newUnsurScores.sort((a, b) => (a.id> b.id ) ? 1 : -1)
         setUnsurScores(sorted)
@@ -71,7 +71,7 @@ const PaDoAssessmentComponent = props => {
         const oldUnsurScore = unsurScores.filter(u=>u.unsur_id === unsur_id)[0]
         const otherOldUnsurScore = unsurScores.filter(u=>u.unsur_id !== unsur_id)
 
-        const newScore = {...oldUnsurScore,staff_score:scoreValue, staffPercentScore:(scoreValue*oldUnsurScore.bobot/100)}
+        const newScore = {...oldUnsurScore, staff_score:scoreValue, staffPercentScore:(scoreValue*oldUnsurScore.bobot/100)}
         const newUnsurScores = [...otherOldUnsurScore, newScore]
         const sorted = newUnsurScores.sort((a, b) => (a.id > b.id) ? 1 : -1)
         setUnsurScores(sorted)
@@ -82,11 +82,30 @@ const PaDoAssessmentComponent = props => {
     useEffect(() => {
 
         const newSubAspekScores = subAspekScores.map(sub=>{
-            const newScoreFromAtasan = unsurScores.filter(atasan=>atasan.sub_aspek_id===sub.sub_aspek_id)
-            .reduce((acc,current)=>acc+current.atasanPercentScore,0)
+            let newScoreFromAtasan, newScoreFromStaff;
 
-            const newScoreFromStaff = unsurScores.filter(staff=>staff.sub_aspek_id===sub.sub_aspek_id)
-            .reduce((acc,current)=>acc+current.staffPercentScore,0)
+            const filteredUnsurScores = unsurScores.filter(staff=>(staff.sub_aspek_id===sub.sub_aspek_id))
+            let optionalZero = null
+            if(props.assessment.atasan_id==props.user.emp_id){//atasan
+                optionalZero = filteredUnsurScores.find(unsur=>(unsur.is_optional===true && unsur.staff_score===0))
+            }else{//staff
+                optionalZero = filteredUnsurScores.find(unsur=>(unsur.is_optional===true && unsur.atasan_score===0))
+            }
+
+            if(optionalZero){
+                newScoreFromAtasan = unsurScores.filter(atasan=>atasan.sub_aspek_id===sub.sub_aspek_id)
+                .reduce((acc,current)=>acc+current.atasanPercentScore,0)
+
+                newScoreFromStaff = unsurScores.filter(staff=>(staff.sub_aspek_id===sub.sub_aspek_id))
+                .reduce((acc,current)=>acc+current.staffPercentScore,0)
+
+            }else{
+                newScoreFromAtasan = unsurScores.filter(atasan=>atasan.sub_aspek_id===sub.sub_aspek_id)
+                .reduce((acc,current)=>acc+current.atasanPercentScore,0)
+
+                newScoreFromStaff = unsurScores.filter(staff=>(staff.sub_aspek_id===sub.sub_aspek_id))
+                .reduce((acc,current)=>acc+current.staffPercentScore,0)
+            }
 
             return {...sub, score:(newScoreFromAtasan * props.assessment.bobot_atasan / 100)+(newScoreFromStaff * props.assessment.bobot_bawahan / 100)}
         })
@@ -221,7 +240,12 @@ const PaDoAssessmentComponent = props => {
                                                             <Grid container className={classes.unsur}>
                                                                 <Grid container className={classes.unsur_row}>
                                                                     <Grid item xs={1}>{unsur.code}</Grid>
-                                                                    <Grid item xs={7}>{unsur.name}</Grid>
+                                                                    <Grid item xs={7}>
+                                                                        {unsur.name}
+                                                                        {unsur.is_optional &&
+                                                                         <span className={classes.optional}>[optional]</span>
+                                                                        }
+                                                                        </Grid>
                                                                     <Grid item container xs={4} justify="space-evenly">
                                                                     {
                                                                     props.assessment.atasan_id==props.user.emp_id &&
@@ -421,6 +445,10 @@ const styles = theme => ({
     },
     note_container:{
         marginTop:20
+    },
+    optional:{
+        color: 'red',
+        display:'inline-block'
     }
 
 

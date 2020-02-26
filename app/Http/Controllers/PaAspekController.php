@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\DB;
 class PaAspekController extends Controller
 {
     public function getByParams(Request $request){
+
         $aspeks ;
         if($request->user_id){
             $aspek_ids = PaAspekDetailer::select("aspek_id")->where('detailer_id',$request->user_id)->get();
@@ -21,7 +22,7 @@ class PaAspekController extends Controller
 
         }
 
-        $aspeks = PaAspek::when($request->is_custom, function ($query) use ($request) {
+        $aspeks = PaAspek::when($request->is_custom!==null, function ($query) use ($request) {
             return $query->where('is_custom', $request->is_custom);
         });
 
@@ -37,6 +38,7 @@ class PaAspekController extends Controller
         $aspek = PaAspek::find($request->id);
         $aspek->name = $request->name;
         $aspek->code = $request->code;
+        $aspek->note = $request->note;
         $aspek->status = $request->status;
         $aspek->updated_by = $request->updated_by;
         $aspek->save();
@@ -47,6 +49,7 @@ class PaAspekController extends Controller
         $aspek = new PaAspek();
         $aspek->name = $request->name;
         $aspek->code = $request->code;
+        $aspek->note = $request->note;
         $aspek->fixed_bobot = $request->fixed_bobot;
         $aspek->is_custom = $request->is_custom;
         $aspek->created_by = $request->creator;

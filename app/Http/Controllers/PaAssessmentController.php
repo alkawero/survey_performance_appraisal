@@ -8,6 +8,7 @@ use \App\PaAssessmentUser;
 use \App\PaAssessmentUnsurScore;
 use \App\PaSubAspek;
 use \App\PaUnsur;
+use \App\Setting;
 use \App\PaMaster;
 use \App\User;
 use \App\Unit;
@@ -152,6 +153,10 @@ class PaAssessmentController extends Controller
         $assessment->pa_master_id = $request->pa_master_id;
         $assessment->created_by = $request->creator;
         $assessment->status = $request->status;
+        $assessment->periode = $request->periode;
+        $assessment->semester = $request->semester;
+        $assessment->valid_from=$request->validFrom;
+        $assessment->valid_until=$request->validUntil;
         $assessment->save();
 
         $participants = $request->participants;
@@ -167,6 +172,11 @@ class PaAssessmentController extends Controller
 
     public function storeAssessmentByAspek(Request $request)
     {
+        $periode = Setting::where('indicator','periode_active')->value('value');
+        $semester_active = Setting::where('indicator','semester_active')->value('value');
+        $appraisal_start_date = Setting::where('indicator','appraisal_start_date')->value('value');
+        $appraisal_end_date = Setting::where('indicator','appraisal_end_date')->value('value');
+
         $subAspeks = $request->sub_aspeks;
             $unsurs = $request->unsurs;
 
@@ -193,6 +203,7 @@ class PaAssessmentController extends Controller
                         $unsur->name = $uns['unsur_name'];
                         $unsur->code = $uns['unsur_code'];
                         $unsur->is_custom = 1;
+                        $unsur->is_optional = $uns['is_optional'];
                         $unsur->category_1_label = $uns['category_1_label'];
                         $unsur->category_2_label = $uns['category_2_label'];
                         $unsur->category_3_label = $uns['category_3_label'];
@@ -217,6 +228,10 @@ class PaAssessmentController extends Controller
         $assessment->custom_aspek_id = $request->aspek_id;
         $assessment->created_by = $request->creator;
         $assessment->status = $request->status;
+        $assessment->periode = $periode;
+        $assessment->semester = intval($semester_active);
+        $assessment->valid_from=$appraisal_start_date;
+        $assessment->valid_until=$appraisal_end_date;
         $assessment->save();
 
         $participants = $request->participants;

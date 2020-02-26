@@ -23,6 +23,7 @@ import FormatListNumbered from '@material-ui/icons/FormatListNumbered';
 import Assessment from '@material-ui/icons/Assessment';
 import AssignmentInd from '@material-ui/icons/AssignmentInd';
 import ChromeReaderMode from '@material-ui/icons/ChromeReaderMode';
+import Settings from '@material-ui/icons/Settings';
 
 import DirectionsRunIcon from '@material-ui/icons/DirectionsRun';
 import FormatListBulleted from '@material-ui/icons/FormatListBulleted';
@@ -85,6 +86,7 @@ import PaMyAssessment from './PaMyAssessment';
 import PaDoAssessment from './PaDoAssessment';
 import PaAssessmentByAspek from './PaAssessmentByAspek';
 import PaDetailAssessment from'./PaDetailAssessment';
+import SystemSetting from'./SystemSetting';
 import ExpandLess from '@material-ui/icons/ExpandLess';
 import ExpandMore from '@material-ui/icons/ExpandMore';
 
@@ -242,7 +244,8 @@ class AppComponent extends Component {
     openProfile : false,
     anchorProfile : null,
     openMenuPa : false,
-    openMenuSurvey:false
+    openMenuSurvey:false,
+    openMenuSeting:false
   }
 
   componentDidMount(){
@@ -258,6 +261,10 @@ class AppComponent extends Component {
 
   toggleMenuSurvey = () => {
     this.setState({openMenuSurvey:!this.state.openMenuSurvey});
+  };
+
+  toggleMenuSeting = () => {
+    this.setState({openMenuSeting:!this.state.openMenuSeting});
   };
 
 
@@ -314,7 +321,7 @@ class AppComponent extends Component {
                             </List>
                         </Collapse>
                         <ListItem button onClick={this.toggleMenuPa}>
-                        <ListItemIcon><Assessment nativeColor='white'/></ListItemIcon>
+                            <ListItemIcon><Assessment nativeColor='white'/></ListItemIcon>
                             <ListItemText primary={<Typography type="body2" style={{ color: '#FFFFFF' }}>Apraisals</Typography>}/>
                             {this.state.openMenuPa ?
                              this.props.isLeftDrawerOpen && <ExpandLess nativeColor='white'/> :
@@ -331,8 +338,19 @@ class AppComponent extends Component {
                                 <MenuItemLink to="/app/pa/external" roles={['adm']} userRole={this.props.loggedUser.role} primary="External Data" icon={<Widgets nativeColor='white'/>}/>
                             </List>
                         </Collapse>
-                        <MenuItemLink to="/app/user" roles={['adm']} userRole={this.props.loggedUser.role} primary="User Administration" icon={<HowToRegIcon nativeColor='white'/>}/>
-
+                        <ListItem button onClick={this.toggleMenuSeting}>
+                            <ListItemIcon><Settings nativeColor='white'/></ListItemIcon>
+                            <ListItemText primary={<Typography type="body2" style={{ color: '#FFFFFF' }}>Setting</Typography>}/>
+                            {this.state.openMenuSeting ?
+                             this.props.isLeftDrawerOpen && <ExpandLess nativeColor='white'/> :
+                             this.props.isLeftDrawerOpen && <ExpandMore nativeColor='white' />}
+                        </ListItem>
+                        <Collapse in={this.state.openMenuSeting} timeout="auto" unmountOnExit>
+                            <List component="div" disablePadding>
+                                <MenuItemLink to="/app/user" roles={['adm']} userRole={this.props.loggedUser.role} primary="User Administration" icon={<HowToRegIcon nativeColor='white'/>}/>
+                                <MenuItemLink to="/app/setting" roles={['adm']} userRole={this.props.loggedUser.role} primary="System Setting" icon={<Settings nativeColor='white'/>}/>
+                            </List>
+                        </Collapse>
                         </List>
     }
     const { classes } = this.props;
@@ -480,6 +498,7 @@ class AppComponent extends Component {
             <Route exact path="/app/assessment/detail" component={PaDetailAssessment}/>
             <Route exact path="/app/pa/external" component={PaExternalData}/>
             <Route exact path="/app/pa/external/create" component={PaExternalDataCreate}/>
+            <Route exact path="/app/setting" component={SystemSetting}/>
 
 
 

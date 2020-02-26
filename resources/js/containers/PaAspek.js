@@ -106,7 +106,7 @@ const PaAspekComponent = (props) => {
                     <Grid item xs={2} align="right">
                         <ActionButton
                             type="fab"
-                            for={["adm","ldr"]}
+                            for={["adm"]}
                             role={props.user.role}
                             action={() =>
                                 history.push("/app/aspek/create")

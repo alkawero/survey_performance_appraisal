@@ -96,6 +96,12 @@ Route::get('pa/external/group', 'PaExternalDataController@getGroups');
 Route::get('pa/external/periode', 'PaExternalDataController@getPeriode');
 Route::delete('pa/external', 'PaExternalDataController@deleteById');
 
+Route::patch('pa/setting', 'SettingController@update');
+Route::post('pa/setting', 'SettingController@store');
+Route::get('pa/setting', 'SettingController@getByParams');
+Route::get('pa/setting/value', 'SettingController@getValue');
+
+
 
 
 

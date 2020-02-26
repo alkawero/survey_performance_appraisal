@@ -39,10 +39,6 @@ class PaMasterController extends Controller
         $master->name = $request->name;
         $master->bobot_atasan = $request->bobot_atasan;
         $master->bobot_bawahan = $request->bobot_bawahan;
-        $master->periode = $request->periode;
-        $master->semester = $request->semester;
-        $master->valid_from=$request->validFrom;
-        $master->valid_until=$request->validUntil;
 
         $master->created_by = $request->creator;
         $master->status = $request->status;

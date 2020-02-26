@@ -20,6 +20,7 @@ class AspekResource extends JsonResource
             'id' => $this->id,
             'code'=>$this->code,
             'name'=>$this->name,
+            'note'=>$this->note,
             'is_custom'=>$this->is_custom,
             'fixed_bobot'=>$this->fixed_bobot,
             'master'=>$master,

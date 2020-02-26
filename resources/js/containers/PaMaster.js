@@ -76,12 +76,6 @@ const PaMasterComponent = props => {
                                             Name
                                         </TableCell>
                                         <TableCell align="center">
-                                            Periode
-                                        </TableCell>
-                                        <TableCell align="center">
-                                            Semester
-                                        </TableCell>
-                                        <TableCell align="center">
                                             aspek codes
                                         </TableCell>
                                         <TableCell align="center">
@@ -98,12 +92,6 @@ const PaMasterComponent = props => {
                                             <TableRow key={row.id}>
                                                 <TableCell align="center">
                                                     {row.name}
-                                                </TableCell>
-                                                <TableCell align="center">
-                                                    {row.periode}
-                                                </TableCell>
-                                                <TableCell align="center">
-                                                    {row.semester}
                                                 </TableCell>
                                                 <TableCell align="center">
                                                     {row.aspek_codes}

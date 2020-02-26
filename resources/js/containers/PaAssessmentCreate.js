@@ -10,6 +10,9 @@ import Select from 'react-select';
 
 import FormControlLabel  from '@material-ui/core/FormControlLabel';
 import Switch  from '@material-ui/core/Switch';
+import DateFnsUtils from '@date-io/date-fns';
+import { MuiPickersUtilsProvider, DatePicker } from 'material-ui-pickers';
+import TextField from "@material-ui/core/TextField";
 
 
 
@@ -38,6 +41,15 @@ const PaAssessmentCreateComponent = (props) =>{
     const [selectedUnitParticipant, setSelectedUnitParticipant] = useState(null)
     const [selectedPaMaster, setSelectedPaMaster] = useState(null)
     const [selectedLeader, setSelectedLeader] = useState(null)
+    const [periode, setPeriode] = useState("");
+    const [semester, setSemester] = useState(null);
+    const [validFrom, setValidFrom] = useState(new Date())
+    const [validUntil, setValidUntil] = useState(new Date())
+    const semesterOptions = [
+        { value: 1, label: "Semester 1" },
+        { value: 2, label: "Semester 2" }
+    ];
+    const [error, setError] = useState("");
 
 
     const participantByOpts = [
@@ -105,6 +117,22 @@ const PaAssessmentCreateComponent = (props) =>{
 
     }
 
+    const periodeChange = e => {
+        setPeriode(e.target.value);
+    };
+
+    const semesterChange = e => {
+        setSemester(e);
+    };
+
+    const handleFromDateChange = date => {
+        setValidFrom(date)
+    }
+
+    const handleUntilDateChange = date => {
+        setValidUntil(date)
+    }
+
     const activeChange = e => {
         setActive(!active);
     };
@@ -151,6 +179,17 @@ const PaAssessmentCreateComponent = (props) =>{
     }
 
     const handleSubmit = async() => {
+
+        if(periode.trim().length<1){
+            setError("Please fill the periode field");
+            inputValid = false; return
+        }
+
+        if(semester===null){
+            setError("Please select the semester");
+            inputValid = false; return
+        }
+
         if(selectedPaMaster!== null && !_.isEmpty(selectedParticipants)){
             create()
             history.back()
@@ -163,7 +202,11 @@ const PaAssessmentCreateComponent = (props) =>{
             participants:selectedParticipants.map((data)=>(data.value)),
             leader_id:selectedLeader.value,
             status:active,
-            creator:props.user.emp_id
+            creator:props.user.emp_id,
+            periode: periode,
+            validFrom: validFrom,
+            validUntil: validUntil,
+            semester: semester.value,
         }
         await doPost('pa/assessment',params,'save assessment')
     }
@@ -183,6 +226,47 @@ const PaAssessmentCreateComponent = (props) =>{
                         New Assessment
                     </Typography>
                 </Grid>
+
+                <Grid container>
+                    <TextField
+                        id="Periode"
+                        label="Periode"
+                        value={periode}
+                        margin="dense"
+                        variant="outlined"
+                        fullWidth
+                        onChange={periodeChange}
+                    />
+                </Grid>
+                <Grid item xs={12} className={classes.marginTops}>
+                    <Select
+                        value={semester}
+                        options={semesterOptions}
+                        onChange={semesterChange}
+                        placeholder="Select Semester"
+                        styles={selectCustomZindex}
+                    />
+                </Grid>
+
+                <MuiPickersUtilsProvider    utils={DateFnsUtils}>
+                    <Grid container justify="space-between">
+
+                        <DatePicker
+                            margin="normal"
+                            label="Valid From"
+                            value={validFrom}
+                            onChange={handleFromDateChange}
+                        />
+
+                        <DatePicker
+                            margin="normal"
+                            label="Valid Until"
+                            value={validUntil}
+                            onChange={handleUntilDateChange}
+                        />
+
+                    </Grid>
+                </MuiPickersUtilsProvider>
 
                 <Grid item xs={12} container direction='column'>
                         <Grid item className={classes.marginTops}>
@@ -294,3 +378,18 @@ const mapStateToProps = state => {
 const PaAssessmentCreate = connect(mapStateToProps)(PaAssessmentCreateComponent);
 
 export default withStyles(styles)(PaAssessmentCreate);
+
+export const selectCustomZindex = {
+    control: (base, state) => ({
+        ...base,
+        minWidth: "150px",
+        margin: "0 4px"
+    }),
+    container: (base, state) => {
+        return {
+            ...base,
+            flex: 1,
+            zIndex: state.isFocused ? "1100" : "1" //Only when current state focused
+        };
+    }
+};

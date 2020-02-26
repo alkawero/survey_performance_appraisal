@@ -25,7 +25,7 @@ import Collapse from '@material-ui/core/Collapse';
 import ExpandLess from '@material-ui/icons/ExpandLess';
 import ExpandMore from '@material-ui/icons/ExpandMore';
 import Widgets from '@material-ui/icons/Widgets';
-import Checkbox from '@material-ui/icons/Checkbox';
+
 
 
 const PaAspekCreateComponent = props => {
@@ -35,6 +35,7 @@ const PaAspekCreateComponent = props => {
     const [status, setStatus] = useState(true);
     const [code, setCode] = useState("");
     const [name, setName] = useState("");
+    const [note, setNote] = useState("");
     const [detailByHrd, setDetailByHrd] = useState(false);
     const [detailers, setDetailers] = useState([]);
     const [subAspeks, setSubAspeks] = useState([]);
@@ -58,6 +59,7 @@ const PaAspekCreateComponent = props => {
         if(props.aspek_to_edit){
             setCode(props.aspek_to_edit.code)
             setName(props.aspek_to_edit.name)
+            setNote(props.aspek_to_edit.note)
         }
     }, [props.aspek_to_edit])
 
@@ -139,6 +141,9 @@ const PaAspekCreateComponent = props => {
     };
     const nameChange = value => {
         setName(value);
+    };
+    const noteChange = value => {
+        setNote(value);
     };
 
     const addSubAspek = () => {
@@ -281,6 +286,7 @@ const PaAspekCreateComponent = props => {
             id:props.aspek_to_edit.id,
             code: code,
             name: name,
+            note: note,
             status: status == true ? 1 : 0,
             updated_by: props.user.emp_id
         };
@@ -309,28 +315,28 @@ const PaAspekCreateComponent = props => {
 
 
     const create = async () => {
-        let params = {}
+        let params = {
+                code: code,
+                name: name,
+                note: note,
+                status: status == true ? 1 : 0,
+                creator: props.user.emp_id
+        }
 
         if(detailByHrd){
             params = {
+                ...params,
                 is_custom:0,
-                code: code,
-                name: name,
                 sub_aspeks:subAspeks,
                 unsurs:unsurs,
-                status: status == true ? 1 : 0,
-                creator: props.user.emp_id
             };
         }else{
             params = {
+                ...params,
                 is_custom:1,
-                code: code,
-                name: name,
                 fixed_bobot:aspekWeight,
                 master_id:selectedPaMaster.value,
                 detailers:detailers.map(user=>(user.value)),
-                status: status == true ? 1 : 0,
-                creator: props.user.emp_id
             };
         }
 
@@ -383,7 +389,7 @@ const PaAspekCreateComponent = props => {
                         />
                     </Grid>
 
-                    <Grid item xs={8}>
+                    <Grid item xs={6}>
                     <DebouncedTextField
                         id="Name"
                         label="Name"
@@ -393,6 +399,18 @@ const PaAspekCreateComponent = props => {
                         variant="outlined"
                         fullWidth
                         onChange={nameChange}
+                    />
+                    </Grid>
+                    <Grid item xs={2}>
+                    <DebouncedTextField
+                        id="note"
+                        label="note"
+                        key_id_1="note"
+                        value={note}
+                        margin="dense"
+                        variant="outlined"
+                        fullWidth
+                        onChange={noteChange}
                     />
                     </Grid>
 

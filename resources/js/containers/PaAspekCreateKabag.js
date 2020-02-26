@@ -15,14 +15,19 @@ import SwapVert from '@material-ui/icons/SwapVert';
 import Remove from '@material-ui/icons/Remove';
 import IconButton from '@material-ui/core/IconButton';
 import Select from "react-select";
+import MoreVert from '@material-ui/icons/MoreVert';
+import Menu from '@material-ui/core/Menu';
+import MenuItem from '@material-ui/core/MenuItem'
 
 const PaAspekCreateKabagComponent = props => {
+    const [anchorEl, setAnchorEl] = React.useState(null);
     const [status, setStatus] = useState(true);
     const [subAspeks, setSubAspeks] = useState([]);
     const [unsurs, setUnsurs] = useState([]);
     const [dataEmployees, setDataEmployees] = useState([]);
     const [allStaffInUnit, setAllStaffInUnit] = useState([]);
     const [staffs, setStaffs] = useState([]);
+    const [selectedunsurCode, setSelectedunsurCode] = useState("")
 
     useEffect(() => {
         getAllStaffInUnit()
@@ -83,6 +88,7 @@ const PaAspekCreateKabagComponent = props => {
             unsur_name:"", order:unsursInSameSubAspek.length+1,
             bobot:0,
             showCategory:false,
+            is_optional:false,
             category_1_label:"",
             category_2_label:"",
             category_3_label:"",
@@ -206,6 +212,24 @@ const PaAspekCreateKabagComponent = props => {
         setUnsurs(sorted)
     }
 
+    const toggleMoreMenu = (unsurCode,event) => {
+        if(anchorEl)
+        setAnchorEl(null);
+        else
+        setAnchorEl(event.currentTarget);
+        setSelectedunsurCode(unsurCode)
+      };
+
+      const setOptional = (value) => {
+        let newUnsur = unsurs.find(unsur=>unsur.unsur_code === selectedunsurCode)
+        newUnsur = {...newUnsur, is_optional: value}
+
+        const otherUnsurs = unsurs.filter(unsur=>unsur.unsur_code !== selectedunsurCode)
+        const sorted = [...otherUnsurs, newUnsur].sort((a, b) => (a.order > b.order) ? 1 : -1)
+        setUnsurs(sorted)
+        setAnchorEl(null)
+      };
+
 
     const submit = () => {
         create();
@@ -275,11 +299,21 @@ const PaAspekCreateKabagComponent = props => {
                         />
                     </Grid>
 
-                    <Grid item xs={7}>
+                    <Grid item xs={6}>
                     <TextField
                         id="Name"
                         label="Name"
                         value={props.assessment.aspek_for_assessment.name}
+                        margin="dense"
+                        variant="outlined"
+                        fullWidth
+                    />
+                    </Grid>
+                    <Grid item xs={1}>
+                    <TextField
+                        id="Note"
+                        label="note"
+                        value={props.assessment.aspek_for_assessment.note}
                         margin="dense"
                         variant="outlined"
                         fullWidth
@@ -364,7 +398,7 @@ const PaAspekCreateKabagComponent = props => {
                                                     />
 
                                                 </Grid>
-                                                <Grid item xs={7}>
+                                                <Grid item xs={6}>
                                                     <TextField
                                                         id="Unsur Name"
                                                         label="Unsur Name"
@@ -405,7 +439,7 @@ const PaAspekCreateKabagComponent = props => {
                                                     </Grid>
                                                 </Grid>
 
-                                                <Grid item xs={2} container justify='center' alignContent="center">
+                                                <Grid item xs={3} container justify='flex-end' alignItems="center">
                                                     <Tooltip title="Delete Unsur">
                                                         <IconButton aria-label="delete" onClick={()=>deleteUnsur(unsur.unsur_code,unsur.sub_aspek_code)}>
                                                             <Delete/>
@@ -413,6 +447,17 @@ const PaAspekCreateKabagComponent = props => {
                                                     </Tooltip>
 
                                                     <OpenCloseCategory open={unsur.showCategory} unsur_code={unsur.unsur_code}/>
+
+                                                    {!unsur.is_optional &&
+                                                    <IconButton  size="small" onClick={(event)=>toggleMoreMenu(unsur.unsur_code,event)} >
+                                                            <MoreVert fontSize="small"/>
+                                                    </IconButton>
+                                                    }
+
+                                                    {
+                                                        unsur.is_optional && <Typography type="body2" onClick={(event)=>toggleMoreMenu(unsur.unsur_code,event)} className={classes.pointer}>optional</Typography>
+                                                    }
+
                                                 </Grid>
                                                 {   unsur.showCategory &&
                                                     <Grid container className={classes.category_container}>
@@ -542,6 +587,18 @@ const PaAspekCreateKabagComponent = props => {
                     </Button>
                 </Grid>
             </Grid>
+
+            <Menu
+                id="ex-data-menu"
+                anchorEl={anchorEl}
+                keepMounted
+                open={Boolean(anchorEl)}
+                onClose={toggleMoreMenu}
+            >
+
+                <MenuItem onClick={()=>setOptional(true)}>Optional</MenuItem>
+                <MenuItem onClick={()=>setOptional(false)}>Mandatory</MenuItem>
+            </Menu>
         </Grid>
     );
 };
@@ -593,6 +650,9 @@ const styles = theme => ({
     },
     side_row_button:{
         flex:1
+    },
+    pointer:{
+        cursor: 'pointer'
     }
 
 });
