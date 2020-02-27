@@ -13,6 +13,7 @@ import Switch  from '@material-ui/core/Switch';
 import DateFnsUtils from '@date-io/date-fns';
 import { MuiPickersUtilsProvider, DatePicker } from 'material-ui-pickers';
 import TextField from "@material-ui/core/TextField";
+import format from 'date-fns/format'
 
 
 
@@ -42,7 +43,7 @@ const PaAssessmentCreateComponent = (props) =>{
     const [selectedPaMaster, setSelectedPaMaster] = useState(null)
     const [selectedLeader, setSelectedLeader] = useState(null)
     const [periode, setPeriode] = useState("");
-    const [semester, setSemester] = useState(null);
+    const [semester, setSemester] = useState(1);
     const [validFrom, setValidFrom] = useState(new Date())
     const [validUntil, setValidUntil] = useState(new Date())
     const semesterOptions = [
@@ -60,9 +61,26 @@ const PaAssessmentCreateComponent = (props) =>{
     ]
 
     useEffect(() => {
+        getSetting()
         getDataMaster()
         getDataParticipants()
     }, [])
+
+    const getSetting = async () =>{
+
+        const periode = await doGet('pa/setting/value',{indicator:'periode_active'})
+        setPeriode(periode.data)
+
+        const semester = await doGet('pa/setting/value',{indicator:'semester_active'})
+        setSemester(semester.data)
+
+        const pa_start = await doGet('pa/setting/value',{indicator:'appraisal_start_date'})
+        setValidFrom(new Date(pa_start.data))
+
+        const pa_end = await doGet('pa/setting/value',{indicator:'appraisal_end_date'})
+        setValidUntil(new Date(pa_end.data))
+    }
+
 
     const getDataMaster = async () =>{
         const params={}
@@ -117,29 +135,9 @@ const PaAssessmentCreateComponent = (props) =>{
 
     }
 
-    const periodeChange = e => {
-        setPeriode(e.target.value);
-    };
-
-    const semesterChange = e => {
-        setSemester(e);
-    };
-
-    const handleFromDateChange = date => {
-        setValidFrom(date)
-    }
-
-    const handleUntilDateChange = date => {
-        setValidUntil(date)
-    }
-
     const activeChange = e => {
         setActive(!active);
     };
-
-
-
-
 
     const leaderOnChange = e => {
         setSelectedLeader(e);
@@ -180,15 +178,6 @@ const PaAssessmentCreateComponent = (props) =>{
 
     const handleSubmit = async() => {
 
-        if(periode.trim().length<1){
-            setError("Please fill the periode field");
-            inputValid = false; return
-        }
-
-        if(semester===null){
-            setError("Please select the semester");
-            inputValid = false; return
-        }
 
         if(selectedPaMaster!== null && !_.isEmpty(selectedParticipants)){
             create()
@@ -204,9 +193,9 @@ const PaAssessmentCreateComponent = (props) =>{
             status:active,
             creator:props.user.emp_id,
             periode: periode,
-            validFrom: validFrom,
-            validUntil: validUntil,
-            semester: semester.value,
+            validFrom:  format(validFrom, "yyyy-MM-dd"),
+            validUntil: format(validUntil, "yyyy-MM-dd"),
+            semester: semester,
         }
         await doPost('pa/assessment',params,'save assessment')
     }
@@ -227,46 +216,41 @@ const PaAssessmentCreateComponent = (props) =>{
                     </Typography>
                 </Grid>
 
-                <Grid container>
-                    <TextField
-                        id="Periode"
-                        label="Periode"
-                        value={periode}
-                        margin="dense"
-                        variant="outlined"
+                <Grid container justify="space-between" alignItems="center">
+                    <Grid item xs={2} >
+                        <TextField
                         fullWidth
-                        onChange={periodeChange}
-                    />
-                </Grid>
-                <Grid item xs={12} className={classes.marginTops}>
-                    <Select
-                        value={semester}
-                        options={semesterOptions}
-                        onChange={semesterChange}
-                        placeholder="Select Semester"
-                        styles={selectCustomZindex}
-                    />
-                </Grid>
-
-                <MuiPickersUtilsProvider    utils={DateFnsUtils}>
-                    <Grid container justify="space-between">
-
-                        <DatePicker
-                            margin="normal"
-                            label="Valid From"
-                            value={validFrom}
-                            onChange={handleFromDateChange}
-                        />
-
-                        <DatePicker
-                            margin="normal"
-                            label="Valid Until"
-                            value={validUntil}
-                            onChange={handleUntilDateChange}
-                        />
-
+                        variant="outlined"
+                        margin="dense"
+                        label='periode'
+                        value={periode}/>
                     </Grid>
-                </MuiPickersUtilsProvider>
+                    <Grid item xs={2} >
+                        <TextField
+                        fullWidth
+                        variant="outlined"
+                        margin="dense"
+                        label='semester'
+                        value={semester}/>
+                    </Grid>
+                    <MuiPickersUtilsProvider    utils={DateFnsUtils}>
+                        <Grid item xs={2} >
+                            <DatePicker
+                                margin="normal"
+                                label="Valid From"
+                                value={validFrom}
+                            />
+                        </Grid>
+                        <Grid item xs={2} >
+                            <DatePicker
+                                margin="normal"
+                                label="Valid Until"
+                                value={validUntil}
+                            />
+                        </Grid>
+                    </MuiPickersUtilsProvider>
+
+                </Grid>
 
                 <Grid item xs={12} container direction='column'>
                         <Grid item className={classes.marginTops}>

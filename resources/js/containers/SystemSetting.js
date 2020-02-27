@@ -13,6 +13,7 @@ import Switch  from '@material-ui/core/Switch';
 import DateFnsUtils from '@date-io/date-fns';
 import { MuiPickersUtilsProvider, DatePicker } from 'material-ui-pickers';
 import TextField from "@material-ui/core/TextField";
+import format from 'date-fns/format'
 
 
 
@@ -106,8 +107,8 @@ const SystemSettingComponent = (props) =>{
                 {indicator:'system_maintenance', value : isSystemMaintenance},
                 {indicator:'periode_active', value : periode},
                 {indicator:'semester_active', value :  semester.value},
-                {indicator:'appraisal_end_date', value : appraisalEndDate},
-                {indicator:'appraisal_start_date', value  : appraisalStartDate}
+                {indicator:'appraisal_end_date', value : format(appraisalEndDate, "yyyy-MM-dd")},
+                {indicator:'appraisal_start_date', value  : format(appraisalStartDate, "yyyy-MM-dd")}
             ],
             updated_by: props.user.emp_id
         }
@@ -117,7 +118,7 @@ const SystemSettingComponent = (props) =>{
 
 
       const {classes} = props;
-      const isSystemMaintenanceLabel = isSystemMaintenance===true?'system active' : 'system maintenance'
+      const isSystemMaintenanceLabel = 'system maintenance'
 
     return (
         <React.Fragment>

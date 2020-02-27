@@ -291,6 +291,7 @@ const PaExternalDataComponent = props => {
                                                 </TableCell>
                                                 <TableCell align="center">
                                                     {editedData.id!==row.id &&
+                                                    <>
                                                     <ActionButton
                                                         type='icon-button'
                                                         for={['adm']}
@@ -298,6 +299,14 @@ const PaExternalDataComponent = props => {
                                                         action={()=>edit(row)}
                                                         icon={<EditIcon fontSize='small'/>}
                                                     />
+                                                    <ActionButton
+                                                        type='icon-button'
+                                                        for={['adm']}
+                                                        role={props.user.role}
+                                                        action={()=>deleteData(row.id)}
+                                                        icon={<Delete />}
+                                                    />
+                                                    </>
                                                     }
 
                                                     {editedData.id===row.id &&
@@ -310,13 +319,6 @@ const PaExternalDataComponent = props => {
                                                     />
                                                     }
 
-                                                    <ActionButton
-                                                        type='icon-button'
-                                                        for={['adm']}
-                                                        role={props.user.role}
-                                                        action={()=>deleteData(row.id)}
-                                                        icon={<Delete />}
-                                                    />
 
                                                 </TableCell>
                                             </TableRow>

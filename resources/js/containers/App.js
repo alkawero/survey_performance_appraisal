@@ -338,13 +338,16 @@ class AppComponent extends Component {
                                 <MenuItemLink to="/app/pa/external" roles={['adm']} userRole={this.props.loggedUser.role} primary="External Data" icon={<Widgets nativeColor='white'/>}/>
                             </List>
                         </Collapse>
-                        <ListItem button onClick={this.toggleMenuSeting}>
+                        {
+                            this.props.loggedUser && this.props.loggedUser.role === 'adm' &&
+                            <ListItem button onClick={this.toggleMenuSeting}>
                             <ListItemIcon><Settings nativeColor='white'/></ListItemIcon>
                             <ListItemText primary={<Typography type="body2" style={{ color: '#FFFFFF' }}>Setting</Typography>}/>
                             {this.state.openMenuSeting ?
                              this.props.isLeftDrawerOpen && <ExpandLess nativeColor='white'/> :
                              this.props.isLeftDrawerOpen && <ExpandMore nativeColor='white' />}
-                        </ListItem>
+                            </ListItem>
+                        }
                         <Collapse in={this.state.openMenuSeting} timeout="auto" unmountOnExit>
                             <List component="div" disablePadding>
                                 <MenuItemLink to="/app/user" roles={['adm']} userRole={this.props.loggedUser.role} primary="User Administration" icon={<HowToRegIcon nativeColor='white'/>}/>

@@ -11,6 +11,7 @@ import TextField from "@material-ui/core/TextField";
 
 import Tooltip from "@material-ui/core/Tooltip";
 import DebouncedTextField from "../components/DebouncedTextField"
+import Modal from '@material-ui/core/Modal';
 
 
 
@@ -23,6 +24,7 @@ const PaDoAssessmentComponent = props => {
     const [grandTotal, setGrandTotal] = useState(0);
     const [category, setCategory] = useState("A");
     const [noteAtasan, setNoteAtasan] = useState("");
+    const [isError, setIsError] = useState(false);
 
     useEffect(() => {
         if(props.assessment){
@@ -84,30 +86,38 @@ const PaDoAssessmentComponent = props => {
         const newSubAspekScores = subAspekScores.map(sub=>{
             let newScoreFromAtasan, newScoreFromStaff;
 
-            const filteredUnsurScores = unsurScores.filter(staff=>(staff.sub_aspek_id===sub.sub_aspek_id))
-            let optionalZero = null
-            if(props.assessment.atasan_id==props.user.emp_id){//atasan
-                optionalZero = filteredUnsurScores.find(unsur=>(unsur.is_optional===true && unsur.staff_score===0))
-            }else{//staff
-                optionalZero = filteredUnsurScores.find(unsur=>(unsur.is_optional===true && unsur.atasan_score===0))
-            }
+            const filteredUnsurScores = unsurScores.filter(unsur=>(unsur.sub_aspek_id===sub.sub_aspek_id))
+            const totalBobotSubAspek = filteredUnsurScores.reduce((acc,current)=>acc+current.bobot,0)
+            console.log("bobot sub "+totalBobotSubAspek)
+            const optionalZeroAtasan = filteredUnsurScores.filter(unsur=>(unsur.is_optional===1 && unsur.atasan_score===0))
+            const optionalZeroStaff = filteredUnsurScores.filter(unsur=>(unsur.is_optional===1 && unsur.staff_score===0))
+            console.log("bobot atasan "+props.assessment.bobot_atasan)
+            console.log("bobot staff "+props.assessment.bobot_bawahan)
 
-            if(optionalZero){
-                newScoreFromAtasan = unsurScores.filter(atasan=>atasan.sub_aspek_id===sub.sub_aspek_id)
-                .reduce((acc,current)=>acc+current.atasanPercentScore,0)
-
-                newScoreFromStaff = unsurScores.filter(staff=>(staff.sub_aspek_id===sub.sub_aspek_id))
-                .reduce((acc,current)=>acc+current.staffPercentScore,0)
-
+            if(optionalZeroAtasan.length>0){
+                const totalScoreAtasan = filteredUnsurScores.reduce((acc,current)=>acc+current.atasan_score,0)
+                newScoreFromAtasan = totalScoreAtasan / (filteredUnsurScores.length - optionalZeroAtasan.length) * totalBobotSubAspek/100
+                console.log(sub.code+" zero atasan "+newScoreFromAtasan)
             }else{
-                newScoreFromAtasan = unsurScores.filter(atasan=>atasan.sub_aspek_id===sub.sub_aspek_id)
-                .reduce((acc,current)=>acc+current.atasanPercentScore,0)
-
-                newScoreFromStaff = unsurScores.filter(staff=>(staff.sub_aspek_id===sub.sub_aspek_id))
-                .reduce((acc,current)=>acc+current.staffPercentScore,0)
+                newScoreFromAtasan = filteredUnsurScores.reduce((acc,current)=>acc + current.atasanPercentScore,0)
+                console.log(sub.code+" atasan "+newScoreFromAtasan)
             }
 
-            return {...sub, score:(newScoreFromAtasan * props.assessment.bobot_atasan / 100)+(newScoreFromStaff * props.assessment.bobot_bawahan / 100)}
+
+            if(optionalZeroStaff.length>0){
+                const totalScoreStaff = filteredUnsurScores.reduce((acc,current)=>acc+current.staff_score,0)
+                newScoreFromStaff = totalScoreStaff / (filteredUnsurScores.length - optionalZeroStaff.length) * totalBobotSubAspek/100
+                console.log(sub.code+" zero staf "+newScoreFromStaff)
+            }else{
+                newScoreFromStaff = filteredUnsurScores.reduce((acc,current)=>acc + current.staffPercentScore,0)
+                console.log(sub.code+" staf "+newScoreFromStaff)
+            }
+
+
+            return {...sub, score:(
+                (newScoreFromAtasan * props.assessment.bobot_atasan/100)
+                +
+                (newScoreFromStaff * props.assessment.bobot_bawahan / 100) )}
         })
 
         setSubAspekScores(newSubAspekScores)
@@ -141,8 +151,19 @@ const PaDoAssessmentComponent = props => {
 
 
     const handleSubmit = async () => {
-            create();
-            history.back();
+        let mandatoryZero
+        if(props.user.emp_id == props.assessment.atasan_id){
+            mandatoryZero = unsurScores.find(unsur=> unsur.is_optional===0 && unsur.atasan_score===0)
+        }else{
+            mandatoryZero = unsurScores.find(unsur=> unsur.is_optional===0 && unsur.staff_score===0)
+        }
+        if(mandatoryZero){
+            setIsError(true)
+            return
+        }
+
+        create();
+        history.back();
     };
 
     const noteChange = (value,optional) => {
@@ -242,15 +263,17 @@ const PaDoAssessmentComponent = props => {
                                                                     <Grid item xs={1}>{unsur.code}</Grid>
                                                                     <Grid item xs={7}>
                                                                         {unsur.name}
-                                                                        {unsur.is_optional &&
-                                                                         <span className={classes.optional}>[optional]</span>
-                                                                        }
                                                                         </Grid>
                                                                     <Grid item container xs={4} justify="space-evenly">
                                                                     {
                                                                     props.assessment.atasan_id==props.user.emp_id &&
                                                                         <Grid item container spacing={8} justify="flex-end" alignItems="center" className={classes.unsur_score} >
                                                                             <Grid item>
+                                                                                {unsur.is_optional===1 &&
+                                                                                    <Tooltip title="optional">
+                                                                                        <span className={classes.optional}>*</span>
+                                                                                    </Tooltip>
+                                                                                }
                                                                                 <CategoryLabel role="atasan" unsur={unsur}/>
                                                                             </Grid>
                                                                             <Grid item>
@@ -285,6 +308,11 @@ const PaDoAssessmentComponent = props => {
                                                                         <Grid item container spacing={8} justify="flex-end" alignItems="center" className={classes.unsur_score} >
 
                                                                             <Grid item>
+                                                                                {unsur.is_optional===1 &&
+                                                                                    <Tooltip title="optional">
+                                                                                        <span className={classes.optional}>*</span>
+                                                                                    </Tooltip>
+                                                                                }
                                                                                 <CategoryLabel role="staff" unsur={unsur}/>
                                                                             </Grid>
 
@@ -369,6 +397,24 @@ const PaDoAssessmentComponent = props => {
                         </Grid>
                     </Grid>
                 </Grid>
+
+
+                <Modal
+                    aria-labelledby="modal"
+                    aria-describedby="modal"
+                    open={isError}
+                    onClose={()=>setIsError(false)}
+                >
+                    <div className={classes.paper}>
+                    {
+                        isError && <h2 id="modal-title">Incomplete form</h2>
+                    }
+
+                    <p id="modal-description">
+                        Please fill all the non optional score
+                    </p>
+                    </div>
+                </Modal>
             </React.Fragment>
         );
     }else{
@@ -448,8 +494,20 @@ const styles = theme => ({
     },
     optional:{
         color: 'red',
-        display:'inline-block'
-    }
+        display:'inline-block',
+        marginRight: 10
+    },
+    paper: {
+        position: 'absolute',
+        top:'50%',
+        left:'50%',
+        marginTop:-65,
+        marginLeft:-200,
+        width: 400,
+        background:'linear-gradient(90deg, #4e54c8 0%,#8f94fb 100% )',
+        padding: 12,
+        color:'white'
+      },
 
 
 });

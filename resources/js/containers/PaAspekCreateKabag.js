@@ -18,6 +18,9 @@ import Select from "react-select";
 import MoreVert from '@material-ui/icons/MoreVert';
 import Menu from '@material-ui/core/Menu';
 import MenuItem from '@material-ui/core/MenuItem'
+import DateFnsUtils from '@date-io/date-fns';
+import { MuiPickersUtilsProvider, DatePicker } from 'material-ui-pickers';
+import format from 'date-fns/format'
 
 const PaAspekCreateKabagComponent = props => {
     const [anchorEl, setAnchorEl] = React.useState(null);
@@ -28,8 +31,13 @@ const PaAspekCreateKabagComponent = props => {
     const [allStaffInUnit, setAllStaffInUnit] = useState([]);
     const [staffs, setStaffs] = useState([]);
     const [selectedunsurCode, setSelectedunsurCode] = useState("")
+    const [periode, setPeriode] = useState("");
+    const [semester, setSemester] = useState(1);
+    const [validFrom, setValidFrom] = useState(new Date())
+    const [validUntil, setValidUntil] = useState(new Date())
 
     useEffect(() => {
+        getSetting()
         getAllStaffInUnit()
     }, [])
 
@@ -40,6 +48,20 @@ const PaAspekCreateKabagComponent = props => {
     };
 
 
+    const getSetting = async () =>{
+
+        const periode = await doGet('pa/setting/value',{indicator:'periode_active'})
+        setPeriode(periode.data)
+
+        const semester = await doGet('pa/setting/value',{indicator:'semester_active'})
+        setSemester(semester.data)
+
+        const pa_start = await doGet('pa/setting/value',{indicator:'appraisal_start_date'})
+        setValidFrom(new Date(pa_start.data))
+
+        const pa_end = await doGet('pa/setting/value',{indicator:'appraisal_end_date'})
+        setValidUntil(new Date(pa_end.data))
+    }
 
 
     const getAllStaffInUnit = async () => {
@@ -245,7 +267,11 @@ const PaAspekCreateKabagComponent = props => {
                 unsurs:unsurs,
                 participants:staffs.map(staff=>(staff.value)),
                 status: status == true ? 1 : 0,
-                creator: props.user.emp_id
+                creator: props.user.emp_id,
+                periode: periode,
+                validFrom:  format(validFrom, "yyyy-MM-dd"),
+                validUntil: format(validUntil, "yyyy-MM-dd"),
+                semester: semester,
             };
 
         await doPost("pa/assessment/aspek", params, "save assessment by aspek");
@@ -280,6 +306,8 @@ const PaAspekCreateKabagComponent = props => {
                         Create Detail of Aspek for Staffs
                     </Typography>
                 </Grid>
+
+
                 <Grid container spacing={8} >
                     <Grid item>
                     <Typography variant="subtitle1">
@@ -287,6 +315,7 @@ const PaAspekCreateKabagComponent = props => {
                     </Typography>
                     </Grid>
                 </Grid>
+
                 <Grid container spacing={8} >
                     <Grid item xs={1}>
                         <TextField
@@ -547,6 +576,42 @@ const PaAspekCreateKabagComponent = props => {
                         options={allStaffInUnit}
                         placeholder='Select staffs'/>
                     </Grid>
+                </Grid>
+
+                <Grid container justify="space-between" alignItems="center">
+                    <Grid item xs={2} >
+                        <TextField
+                        fullWidth
+                        variant="outlined"
+                        margin="dense"
+                        label='periode'
+                        value={periode}/>
+                    </Grid>
+                    <Grid item xs={2} >
+                        <TextField
+                        fullWidth
+                        variant="outlined"
+                        margin="dense"
+                        label='semester'
+                        value={semester}/>
+                    </Grid>
+                    <MuiPickersUtilsProvider    utils={DateFnsUtils}>
+                        <Grid item xs={2} >
+                            <DatePicker
+                                margin="normal"
+                                label="Valid From"
+                                value={validFrom}
+                            />
+                        </Grid>
+                        <Grid item xs={2} >
+                            <DatePicker
+                                margin="normal"
+                                label="Valid Until"
+                                value={validUntil}
+                            />
+                        </Grid>
+                    </MuiPickersUtilsProvider>
+
                 </Grid>
 
                 <Grid container>

@@ -21,7 +21,7 @@ class SettingController extends Controller
     }
 
     public function getValue(Request $request){
-        $value = Setting::where('indicator', $request->indicator)->value(indicator);
+        $value = Setting::where('indicator', $request->indicator)->value('value');
         return $value;
     }
 

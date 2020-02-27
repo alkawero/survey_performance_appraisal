@@ -38,10 +38,17 @@ const PaExternalDataCreateComponent = (props) =>{
     ]
 
     useEffect(() => {
+        getPeriode()
         getDataGroup()
         getDataUnit()
     }, [])
 
+
+    const getPeriode = async () =>{
+        const params={indicator:'periode_active'}
+        const response = await doGet('pa/setting/value',params)
+        setPeriode(response.data)
+    }
 
     const getDataGroup = async () =>{
         const params={}
@@ -90,11 +97,6 @@ const PaExternalDataCreateComponent = (props) =>{
         setSelectedUnitOwner(
             selectedUnitOwner.filter(unit=>(unit.value!=unit_id))
         )
-    }
-
-
-    const periodeChange = (value) =>{
-        setPeriode(value)
     }
 
     const groupOnChange = (e) =>{
@@ -159,14 +161,12 @@ const PaExternalDataCreateComponent = (props) =>{
                 <Grid item xs={12} container direction='column'>
 
                     <Grid item container className={classes.marginTops}>
-                        <DebouncedTextField
-                        id={periode}
+                        <TextField
                         fullWidth
                         variant="outlined"
                         margin="dense"
                         label='periode'
-                        value={periode}
-                        onChange={periodeChange}/>
+                        value={periode}/>
                     </Grid>
 
                     <Grid item container spacing={16} className={classes.marginTops}>
