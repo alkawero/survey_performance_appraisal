@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use \App\PaSubAspek;
 use App\Http\Resources\SubAspekResource;
+use Illuminate\Support\Facades\DB;
 
 class PaSubAspekController extends Controller
 {
@@ -42,5 +43,18 @@ class PaSubAspekController extends Controller
         $aspek->code = $request->code;
         $aspek->updated_by = $request->updated_by;
         $aspek->save();
+    }
+
+    public function deleteById(Request $request){
+        $unsurIds = DB::table('pa_unsurs')->where('sub_aspek_id', $request->id)->pluck('id');
+
+        DB::table('sub_aspek_scores')->where('sub_aspek_id', $request->id)->delete();
+        DB::table('sub_aspek_to_users')->where('sub_aspek_id', $request->id)->delete();
+        DB::table('assessment_unsur_scores')->whereIn('unsur_id', $unsurIds)->delete();
+        DB::table('pa_master_bobot_unsur')->whereIn('unsur_id', $unsurIds)->delete();
+        DB::table('pa_scores')->whereIn('unsur_id', $unsurIds)->delete();
+        DB::table('unsur_to_users')->whereIn('unsur_id', $unsurIds)->delete();
+        DB::table('pa_unsurs')->where('sub_aspek_id', $request->id)->delete();
+        DB::table('pa_sub_aspeks')->where('id', $request->id)->delete();
     }
 }

@@ -88,6 +88,7 @@ const PaAspekComponent = (props) => {
 
     const deleteData = async(data_id)=>{
         const params={id:data_id}
+        setDataTable(dataTable.filter(data=>data.id!==data_id))
         await doDelete('pa/aspek',params)
         setTobeDelete(0)
         getData(page)
@@ -178,7 +179,7 @@ const PaAspekComponent = (props) => {
                                                 <TableCell align="center">
                                                 {row.status_value}
                                                 </TableCell>
-                                                <TableCell align="center">
+                                                <TableCell align="left" style={{width:250}}>
                                                 <ActionButton
                                                     type="icon-button"
                                                     for={["ldr"]}
@@ -204,9 +205,8 @@ const PaAspekComponent = (props) => {
                                                         />
                                                     }
                                                     {tobeDelete===row.id &&
-
+                                                        <>are you sure ?
                                                         <ClickAwayListener onClickAway={()=>setTobeDelete(0)}>
-
                                                                 <ActionButton
                                                                     tooltip={true}
                                                                     title="click again to delete"
@@ -216,8 +216,8 @@ const PaAspekComponent = (props) => {
                                                                     action={()=>deleteData(row.id)}
                                                                     icon={<DeleteForever />}
                                                                 />
-
                                                         </ClickAwayListener>
+                                                        </>
                                                     }
                                                 </TableCell>
 
