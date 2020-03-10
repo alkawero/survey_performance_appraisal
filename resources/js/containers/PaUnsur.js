@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import {setUnsurEdit} from '../actions'
 import { connect } from "react-redux";
-import { doGet } from "../services/api-service";
+import { doGet,doDelete } from "../services/api-service";
 import Typography from "@material-ui/core/Typography";
 import { withStyles } from "@material-ui/core/styles";
 import history from "../history.js";
@@ -26,7 +26,9 @@ import Search from "@material-ui/icons/Search";
 import ActionButton from "../components/ActionButton";
 import TableFooter  from '@material-ui/core/TableFooter';
 import TablePagination   from '@material-ui/core/TablePagination';
-
+import ClickAwayListener from '@material-ui/core/ClickAwayListener';
+import Delete from "@material-ui/icons/Delete";
+import DeleteForever from "@material-ui/icons/DeleteForever";
 
 const PaUnsurComponent = (props) => {
 
@@ -41,6 +43,7 @@ const PaUnsurComponent = (props) => {
     const [page, setPage] = useState(1)
     const [totalRows, setTotalRows] = useState(0)
     const [filterParams, setFilterParams] = useState({})
+    const [tobeDelete, setTobeDelete] = useState(0)
 
     const changePage=(event, newPage)=>{
         setPage(newPage+1)
@@ -122,6 +125,17 @@ const PaUnsurComponent = (props) => {
     const edit = async(unsur)=>{
         props.setUnsurEdit(unsur)
         history.push("/app/unsur/create")
+    }
+    const confirmDelete = (data_id)=>{
+        setTobeDelete(data_id)
+    }
+
+    const deleteData = async(data_id)=>{
+        const params={id:data_id}
+        setDataTable(dataTable.filter(data=>data.id!==data_id))
+        await doDelete('pa/unsur',params)
+        setTobeDelete(0)
+        getData(page,filterParams)
     }
 
 
@@ -232,13 +246,38 @@ const PaUnsurComponent = (props) => {
                                                 <TableCell align="center">
                                                 {row.status_value}
                                                 </TableCell>
-                                                <TableCell align="center">
+                                                <TableCell align="left" style={{width:250}}>
                                                     <ActionButton
                                                         type='icon-button'
                                                         for={['adm']}
                                                         role={props.user.role}
                                                         action={()=>edit(row)}
                                                         icon={<EditIcon fontSize='small'/>}/>
+
+                                                    {tobeDelete!==row.id &&
+                                                            <ActionButton
+                                                                    type='icon-button'
+                                                                    for={['adm']}
+                                                                    role={props.user.role}
+                                                                    action={()=>confirmDelete(row.id)}
+                                                                    icon={<Delete />}
+                                                            />
+                                                        }
+                                                        {tobeDelete===row.id &&
+                                                            <>are you sure ?
+                                                            <ClickAwayListener onClickAway={()=>setTobeDelete(0)}>
+                                                                    <ActionButton
+                                                                        tooltip={true}
+                                                                        title="click again to delete"
+                                                                        type='icon-button'
+                                                                        for={['adm']}
+                                                                        role={props.user.role}
+                                                                        action={()=>deleteData(row.id)}
+                                                                        icon={<DeleteForever />}
+                                                                    />
+                                                            </ClickAwayListener>
+                                                            </>
+                                                        }
                                                 </TableCell>
                                             </TableRow>
 

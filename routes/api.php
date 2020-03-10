@@ -76,6 +76,7 @@ Route::delete('pa/subaspek', 'PaSubAspekController@deleteById');
 Route::get('pa/unsur', 'PaUnsurController@getByParams');
 Route::post('pa/unsur', 'PaUnsurController@store');
 Route::put('pa/unsur', 'PaUnsurController@update');
+Route::delete('pa/unsur', 'PaUnsurController@deleteById');
 Route::get('pa/assessment', 'PaAssessmentController@getDataAssessment');
 Route::get('pa/assessment/my', 'PaAssessmentController@getMyAssessments');
 Route::get('pa/assessment/do', 'PaAssessmentController@getDataDoAssessments');

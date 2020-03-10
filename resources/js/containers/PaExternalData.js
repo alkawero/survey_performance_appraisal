@@ -19,11 +19,6 @@ import DialogTitle from "@material-ui/core/DialogTitle";
 import Select from 'react-select';
 import Search from "@material-ui/icons/Search";
 import Done from "@material-ui/icons/Done";
-import Delete from "@material-ui/icons/Delete";
-import Visibility from "@material-ui/icons/Visibility";
-
-import ExpandMore from "@material-ui/icons/ExpandMore";
-import ExpandLess from "@material-ui/icons/ExpandLess";
 import IconButton from '@material-ui/core/IconButton';
 
 import EditIcon from "@material-ui/icons/Edit";
@@ -32,6 +27,9 @@ import AddIcon from "@material-ui/icons/Add";
 import TableFooter  from '@material-ui/core/TableFooter';
 import TablePagination   from '@material-ui/core/TablePagination';
 import TextField  from '@material-ui/core/TextField';
+import ClickAwayListener from '@material-ui/core/ClickAwayListener';
+import Delete from "@material-ui/icons/Delete";
+import DeleteForever from "@material-ui/icons/DeleteForever";
 
 const PaExternalDataComponent = props => {
     const { classes } = props;
@@ -46,6 +44,7 @@ const PaExternalDataComponent = props => {
     const [selectedGroup, setSelectedGroup] = useState(null)
     const [periodeOptions, setPeriodeOptions] = useState([])
     const [selectedPeriode, setSelectedPeriode] = useState(null)
+    const [tobeDelete, setTobeDelete] = useState(0)
 
     const changePage=(event, newPage)=>{
         setPage(newPage+1)
@@ -128,11 +127,18 @@ const PaExternalDataComponent = props => {
         setEditedData(data)
     }
 
+    const confirmDelete = (data_id)=>{
+        setTobeDelete(data_id)
+    }
+
     const deleteData = async(data_id)=>{
         const params={id:data_id}
         await doDelete('pa/external',params)
+        setTobeDelete(0)
         getData(page,filterParams)
     }
+
+
 
     const doneEditing = async ()=>{
         const params = {
@@ -289,7 +295,7 @@ const PaExternalDataComponent = props => {
                                                 <TableCell align="center">
                                                     {row.created_by}
                                                 </TableCell>
-                                                <TableCell align="center">
+                                                <TableCell align="left" style={{width:250}}>
                                                     {!editedData.id &&
                                                     <>
                                                     <ActionButton
@@ -299,13 +305,30 @@ const PaExternalDataComponent = props => {
                                                         action={()=>edit(row)}
                                                         icon={<EditIcon fontSize='small'/>}
                                                     />
-                                                    <ActionButton
-                                                        type='icon-button'
-                                                        for={['adm']}
-                                                        role={props.user.role}
-                                                        action={()=>deleteData(row.id)}
-                                                        icon={<Delete />}
-                                                    />
+                                                        {tobeDelete!==row.id &&
+                                                            <ActionButton
+                                                                    type='icon-button'
+                                                                    for={['adm']}
+                                                                    role={props.user.role}
+                                                                    action={()=>confirmDelete(row.id)}
+                                                                    icon={<Delete />}
+                                                            />
+                                                        }
+                                                        {tobeDelete===row.id &&
+                                                            <>are you sure ?
+                                                            <ClickAwayListener onClickAway={()=>setTobeDelete(0)}>
+                                                                    <ActionButton
+                                                                        tooltip={true}
+                                                                        title="click again to delete"
+                                                                        type='icon-button'
+                                                                        for={['adm']}
+                                                                        role={props.user.role}
+                                                                        action={()=>deleteData(row.id)}
+                                                                        icon={<DeleteForever />}
+                                                                    />
+                                                            </ClickAwayListener>
+                                                            </>
+                                                        }
                                                     </>
                                                     }
 

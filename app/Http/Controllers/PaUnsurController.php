@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use \App\PaUnsur;
 use App\Http\Resources\UnsurResource;
+use Illuminate\Support\Facades\DB;
 
 class PaUnsurController extends Controller
 {
@@ -46,5 +47,13 @@ class PaUnsurController extends Controller
         $aspek->code = $request->code;
         $aspek->updated_by = $request->updated_by;
         $aspek->save();
+    }
+
+    public function deleteById(Request $request){
+        DB::table('assessment_unsur_scores')->where('unsur_id', $request->id)->delete();
+        DB::table('pa_master_bobot_unsur')->where('unsur_id', $request->id)->delete();
+        DB::table('pa_scores')->where('unsur_id', $request->id)->delete();
+        DB::table('unsur_to_users')->where('unsur_id', $request->id)->delete();
+        DB::table('pa_unsurs')->where('id', $request->id)->delete();
     }
 }
