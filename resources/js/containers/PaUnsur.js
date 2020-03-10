@@ -56,6 +56,7 @@ const PaUnsurComponent = (props) => {
         getDataAspek()
         getDataSubAspek()
         getData(page)
+        props.setUnsurEdit(null)
     }, [])
 
     useEffect(() => {

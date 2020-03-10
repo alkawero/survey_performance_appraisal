@@ -27,7 +27,7 @@ Route::delete('user/admin/{empId}', 'UserController@deleteUserAdmin');
 Route::get('user/{empId}', 'UserController@getUser');
 Route::get('unit', 'UnitController@getAll');
 
-Route::get('survey/page/{startFrom}', 'SurveyController@getSurveyList');
+Route::get('survey', 'SurveyController@getByParams');
 Route::post('survey', 'SurveyController@storeSurvey');
 Route::patch('survey', 'SurveyController@updateSurvey');
 Route::get('survey/select/', 'SurveyController@getSurveyForSelect');
@@ -68,6 +68,7 @@ Route::get('pa/aspek', 'PaAspekController@getByParams');
 Route::get('pa/aspek/assessment', 'PaAspekController@getByParams');
 Route::post('pa/aspek', 'PaAspekController@store');
 Route::put('pa/aspek', 'PaAspekController@update');
+Route::delete('pa/aspek', 'PaAspekController@deleteById');
 Route::get('pa/subaspek', 'PaSubAspekController@getByParams');
 Route::post('pa/subaspek', 'PaSubAspekController@store');
 Route::put('pa/subaspek', 'PaSubAspekController@update');
@@ -85,6 +86,7 @@ Route::put('pa/assessment/approval/staff', 'PaAssessmentController@staffApproval
 Route::put('pa/assessment/edit/staff', 'PaAssessmentController@setEditAccess');
 Route::post('pa/assessment/do', 'PaAssessmentController@storeScores');
 Route::get('pa/assessment/detail', 'PaAssessmentController@getAssessmentDetail');
+Route::get('pa/assessment/periodes', 'PaAssessmentController@getInsertedPeriodes');
 Route::get('pa/assessment/export/excel', 'PaAssessmentController@exportExcel');
 Route::get('pa/assessment/export/pdf', 'PaAssessmentController@exportDetailToPdf');
 

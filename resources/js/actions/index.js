@@ -362,6 +362,11 @@ export function setAspekEdit(data){
     return{type:'SET_ASPEK_EDIT',payload:data}
 }
 
+export function unsetAspekEdit(){
+    return{type:'UNSET_ASPEK_EDIT'}
+}
+
+
 export function setSubAspekEdit(data){
     return{type:'SET_SUBASPEK_EDIT',payload:data}
 }
@@ -376,6 +381,10 @@ export function getAssessmentDetail(data){
 
 export function setAssessmentDetail(data){
     return{type:'SET_ASSESSMENT_DETAIL',payload:data}
+}
+
+export function setSystemMaintenance(data){
+    return{type:'SET_SYSTEM_MAINTENANCE',payload:data}
 }
 
 

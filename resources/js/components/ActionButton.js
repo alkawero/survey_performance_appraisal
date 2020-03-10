@@ -1,6 +1,7 @@
 import React from 'react';
 import IconButton from '@material-ui/core/IconButton';
 import Fab from '@material-ui/core/Fab';
+import Tooltip  from "@material-ui/core/Tooltip";
 
 
 
@@ -8,9 +9,11 @@ const ActionButton = (props) => {
         if(props.for.includes(props.role)){
             if(props.type==='icon-button'){
                 return(
-                    <IconButton disabled ={props.disabled} onClick={props.action} size="small" color="primary" >
-                        {props.icon}
-                    </IconButton>
+                    <Tooltip open={props.tooltip===true} title={props.title}>
+                        <IconButton disabled ={props.disabled} onClick={props.action} size="small" color="primary" >
+                            {props.icon}
+                        </IconButton>
+                    </Tooltip>
                 )
             }
             else if(props.type==='fab'){

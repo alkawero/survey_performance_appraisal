@@ -9,7 +9,7 @@ class PaAssessmentUser extends Model
     protected $table        = 'assessments_users';
 
     public function participant(){
-        return $this->belongsTo('App\User','participant_id')->select('emp_id','emp_name');
+        return $this->belongsTo('App\User','participant_id')->select('emp_id','emp_name','unit_id');
     }
 
     public function atasan(){

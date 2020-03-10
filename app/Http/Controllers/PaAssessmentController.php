@@ -103,10 +103,16 @@ class PaAssessmentController extends Controller
             $filtering = true;
         }
 
+
         if($filtering){
             $assessmentUsers = PaAssessmentUser::whereIn('participant_id',$user_ids);
         }else{
             $assessmentUsers = new PaAssessmentUser();
+        }
+
+        if($request->periode){
+            $assessmentIds = PaAssessment::where('periode',$request->periode)->pluck('id');
+            $assessmentUsers = $assessmentUsers->whereIn('assessment_id',$assessmentIds);
         }
 
 
@@ -388,6 +394,11 @@ class PaAssessmentController extends Controller
         $assessmentUser = PaAssessmentUser::find($request->assessment_user_id);
         $assessmentUser -> fill_by_staff = $request->fill_by_staff;
         $assessmentUser->save();
+    }
+
+    public function getInsertedPeriodes(Request $request){
+        $periodes = PaAssessment::groupBy('periode')->pluck('periode');
+        return $periodes;
     }
 
 }

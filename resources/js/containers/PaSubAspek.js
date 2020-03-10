@@ -43,6 +43,7 @@ const PaSubAspekComponent = (props) => {
     useEffect(() => {
         getDataAspek()
         getData(page)
+        props.setSubAspekEdit(null)
     }, [])
 
     useEffect(() => {

@@ -50,14 +50,18 @@ const PaDoAssessmentComponent = props => {
 
 
     const atasanUnsurChange = (unsur_id,e) => {
+
+        const oldUnsurScore = unsurScores.find(u=>u.unsur_id === unsur_id)
+        if(oldUnsurScore.external_data){
+            return
+        }
+        const otherOldUnsurScore = unsurScores.filter(u=>u.unsur_id !== unsur_id)
+
+
         let scoreValue = parseInt(e.target.value);
         if(scoreValue>maxScore){
             scoreValue = maxScore
         }
-
-        const oldUnsurScore = unsurScores.filter(u=>u.unsur_id === unsur_id)[0]
-        const otherOldUnsurScore = unsurScores.filter(u=>u.unsur_id !== unsur_id)
-
         const newScore = {...oldUnsurScore, atasan_score:scoreValue, atasanPercentScore:(scoreValue*oldUnsurScore.bobot/100)}
         const newUnsurScores = [...otherOldUnsurScore, newScore]
         const sorted = newUnsurScores.sort((a, b) => (a.id> b.id ) ? 1 : -1)
@@ -66,13 +70,17 @@ const PaDoAssessmentComponent = props => {
     };
 
     const staffUnsurChange = (unsur_id,e) => {
+
+        const oldUnsurScore = unsurScores.find(u=>u.unsur_id === unsur_id)
+        if(oldUnsurScore.external_data){
+            return
+        }
+        const otherOldUnsurScore = unsurScores.filter(u=>u.unsur_id !== unsur_id)
+
         let scoreValue = parseInt(e.target.value);
         if(scoreValue>maxScore){
             scoreValue = maxScore
         }
-        const oldUnsurScore = unsurScores.filter(u=>u.unsur_id === unsur_id)[0]
-        const otherOldUnsurScore = unsurScores.filter(u=>u.unsur_id !== unsur_id)
-
         const newScore = {...oldUnsurScore, staff_score:scoreValue, staffPercentScore:(scoreValue*oldUnsurScore.bobot/100)}
         const newUnsurScores = [...otherOldUnsurScore, newScore]
         const sorted = newUnsurScores.sort((a, b) => (a.id > b.id) ? 1 : -1)
@@ -88,29 +96,22 @@ const PaDoAssessmentComponent = props => {
 
             const filteredUnsurScores = unsurScores.filter(unsur=>(unsur.sub_aspek_id===sub.sub_aspek_id))
             const totalBobotSubAspek = filteredUnsurScores.reduce((acc,current)=>acc+current.bobot,0)
-            console.log("bobot sub "+totalBobotSubAspek)
             const optionalZeroAtasan = filteredUnsurScores.filter(unsur=>(unsur.is_optional===1 && unsur.atasan_score===0))
             const optionalZeroStaff = filteredUnsurScores.filter(unsur=>(unsur.is_optional===1 && unsur.staff_score===0))
-            console.log("bobot atasan "+props.assessment.bobot_atasan)
-            console.log("bobot staff "+props.assessment.bobot_bawahan)
 
             if(optionalZeroAtasan.length>0){
                 const totalScoreAtasan = filteredUnsurScores.reduce((acc,current)=>acc+current.atasan_score,0)
                 newScoreFromAtasan = totalScoreAtasan / (filteredUnsurScores.length - optionalZeroAtasan.length) * totalBobotSubAspek/100
-                console.log(sub.code+" zero atasan "+newScoreFromAtasan)
             }else{
                 newScoreFromAtasan = filteredUnsurScores.reduce((acc,current)=>acc + current.atasanPercentScore,0)
-                console.log(sub.code+" atasan "+newScoreFromAtasan)
             }
 
 
             if(optionalZeroStaff.length>0){
                 const totalScoreStaff = filteredUnsurScores.reduce((acc,current)=>acc+current.staff_score,0)
                 newScoreFromStaff = totalScoreStaff / (filteredUnsurScores.length - optionalZeroStaff.length) * totalBobotSubAspek/100
-                console.log(sub.code+" zero staf "+newScoreFromStaff)
             }else{
                 newScoreFromStaff = filteredUnsurScores.reduce((acc,current)=>acc + current.staffPercentScore,0)
-                console.log(sub.code+" staf "+newScoreFromStaff)
             }
 
 
@@ -274,6 +275,12 @@ const PaDoAssessmentComponent = props => {
                                                                                         <span className={classes.optional}>*</span>
                                                                                     </Tooltip>
                                                                                 }
+
+                                                                                {unsur.external_data &&
+                                                                                    <Tooltip title="external data">
+                                                                                        <span className={classes.optional}>*</span>
+                                                                                    </Tooltip>
+                                                                                }
                                                                                 <CategoryLabel role="atasan" unsur={unsur}/>
                                                                             </Grid>
                                                                             <Grid item>
@@ -310,6 +317,11 @@ const PaDoAssessmentComponent = props => {
                                                                             <Grid item>
                                                                                 {unsur.is_optional===1 &&
                                                                                     <Tooltip title="optional">
+                                                                                        <span className={classes.optional}>*</span>
+                                                                                    </Tooltip>
+                                                                                }
+                                                                                {unsur.external_data &&
+                                                                                    <Tooltip title="external data">
                                                                                         <span className={classes.optional}>*</span>
                                                                                     </Tooltip>
                                                                                 }

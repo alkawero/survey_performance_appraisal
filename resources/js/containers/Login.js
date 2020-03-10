@@ -16,26 +16,6 @@ import  Typography  from '@material-ui/core/Typography';
 import Snackbar from '@material-ui/core/Snackbar';
 import MySnackBarContent from '../components/MySnackBarContent';
 
-const LoginLink = props => <Link to="/app" {...props} />
-
-const styles = theme =>({
-    container: {
-        minHeight: '100vh',
-        background:'linear-gradient(180deg, #005aa7 10%,#fffde4 100% );',
-
-    },
-    paper:{
-        padding:20,
-        width:400,
-        background:'linear-gradient(180deg, #005aa7 0%,#fffde4 10% );',
-    },
-    tittle:{
-        color:'#ffffff',
-        fontSize:48,
-        marginTop:20
-    },
-
-})
 
 const loginSchema = Yup.object().shape({
     username: Yup.string()
@@ -66,6 +46,7 @@ class LoginComponent extends Component{
         const error = this.props.error_login ? this.props.error_login:''
 
         const imageSrc = process.env.MIX_APP_ENV=='DEV' || process.env.MIX_APP_ENV=='PROD' ? process.env.MIX_APP_URL_DEV+'/images/logo.png':process.env.MIX_APP_URL_LOCAL+'/images/logo.png'
+
 
         if( ['adm'].includes(this.props.loggedUser.role))
         return <Redirect to="/app/dashboard" />
@@ -159,8 +140,30 @@ class LoginComponent extends Component{
 
 
         )
-    }
+        }
+
+
+
 }
+
+const styles = theme =>({
+    container: {
+        minHeight: '100vh',
+        background:'linear-gradient(180deg, #005aa7 10%,#fffde4 100% );',
+
+    },
+    paper:{
+        padding:20,
+        width:400,
+        background:'linear-gradient(180deg, #005aa7 0%,#fffde4 10% );',
+    },
+    tittle:{
+        color:'#ffffff',
+        fontSize:48,
+        marginTop:20
+    },
+
+})
 
 const mapStateToProps = state => {
     return {
@@ -169,6 +172,7 @@ const mapStateToProps = state => {
         show_snack : state.ui.show_snack,
         snack_message : state.ui.snack_message,
         snack_variant : state.ui.snack_variant,
+
      };
   };
 
@@ -176,7 +180,7 @@ const mapStateToProps = state => {
     return {
         login : loginData => dispatch(login(loginData)),
         toggleSnackBar: data =>dispatch(toggleSnackBar(data)),
-    };
+            };
   }
 
 const Login = connect(mapStateToProps,mapDispatchToProps)(LoginComponent);

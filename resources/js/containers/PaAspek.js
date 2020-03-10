@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from "react";
-import {setAspekForAssessment,setAspekEdit} from '../actions'
+import {setAspekForAssessment,setAspekEdit,unsetAspekEdit} from '../actions'
 import { connect } from "react-redux";
-import { doGet } from "../services/api-service";
+import { doGet,doDelete } from "../services/api-service";
 import Typography from "@material-ui/core/Typography";
 import { withStyles } from "@material-ui/core/styles";
 import history from "../history.js";
 import IconButton from "@material-ui/core/IconButton";
 import Button from "@material-ui/core/Button";
-import Fab from "@material-ui/core/Fab";
+import Delete from "@material-ui/icons/Delete";
+import DeleteForever from "@material-ui/icons/DeleteForever";
 import AddIcon from "@material-ui/icons/Add";
 import EditIcon from "@material-ui/icons/Edit";
 import DoneIcon from "@material-ui/icons/Done";
@@ -26,6 +27,8 @@ import DialogTitle from "@material-ui/core/DialogTitle";
 import ActionButton from "../components/ActionButton";
 import TableFooter  from '@material-ui/core/TableFooter';
 import TablePagination   from '@material-ui/core/TablePagination';
+import ClickAwayListener from '@material-ui/core/ClickAwayListener';
+
 
 
 const PaAspekComponent = (props) => {
@@ -36,6 +39,13 @@ const PaAspekComponent = (props) => {
     const [rowsPerPage, setRowsPerPage] = useState(10)
     const [page, setPage] = useState(1)
     const [totalRows, setTotalRows] = useState(0)
+    const [tobeDelete, setTobeDelete] = useState(0)
+
+
+
+    useEffect(() => {
+        props.unsetAspekEdit()
+    }, [])
 
     useEffect(() => {
         if(props.user){
@@ -70,6 +80,17 @@ const PaAspekComponent = (props) => {
     const edit = (aspek)=>{
         props.setAspekEdit(aspek)
         history.push("/app/aspek/create")
+    }
+
+    const confirmDelete = (data_id)=>{
+        setTobeDelete(data_id)
+    }
+
+    const deleteData = async(data_id)=>{
+        const params={id:data_id}
+        await doDelete('pa/aspek',params)
+        setTobeDelete(0)
+        getData(page)
     }
 
     const changePage=(event, newPage)=>{
@@ -172,6 +193,32 @@ const PaAspekComponent = (props) => {
                                                     role={props.user.role}
                                                     action={()=>edit(row)}
                                                     icon={<EditIcon fontSize='small'/>}/>
+
+                                                    {tobeDelete!==row.id &&
+                                                        <ActionButton
+                                                                type='icon-button'
+                                                                for={['adm']}
+                                                                role={props.user.role}
+                                                                action={()=>confirmDelete(row.id)}
+                                                                icon={<Delete />}
+                                                        />
+                                                    }
+                                                    {tobeDelete===row.id &&
+
+                                                        <ClickAwayListener onClickAway={()=>setTobeDelete(0)}>
+
+                                                                <ActionButton
+                                                                    tooltip={true}
+                                                                    title="click again to delete"
+                                                                    type='icon-button'
+                                                                    for={['adm']}
+                                                                    role={props.user.role}
+                                                                    action={()=>deleteData(row.id)}
+                                                                    icon={<DeleteForever />}
+                                                                />
+
+                                                        </ClickAwayListener>
+                                                    }
                                                 </TableCell>
 
                                             </TableRow>
@@ -300,6 +347,7 @@ const mapDispatchToProps = dispatch => {
         setAspekForAssessment: aspek_id => dispatch(setAspekForAssessment(aspek_id)),
 
         setAspekEdit: aspek => dispatch(setAspekEdit(aspek)),
+        unsetAspekEdit: () => dispatch(unsetAspekEdit()),
     };
   }
 

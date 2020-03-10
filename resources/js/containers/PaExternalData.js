@@ -290,7 +290,7 @@ const PaExternalDataComponent = props => {
                                                     {row.created_by}
                                                 </TableCell>
                                                 <TableCell align="center">
-                                                    {editedData.id!==row.id &&
+                                                    {!editedData.id &&
                                                     <>
                                                     <ActionButton
                                                         type='icon-button'

@@ -14,6 +14,7 @@ import { Provider } from "react-redux";
 import store from './store';
 import { Router, Route,Switch } from "react-router-dom";
 import history from "./history";
+import Maintenance from './containers/Maintenance';
 
 
 ReactDOM.render(
@@ -21,10 +22,11 @@ ReactDOM.render(
         <Router history={history}>
             <Switch>
                 <Route exact path="/" component={Login} />
-                <Route path="/app" component={App} />            
-            </Switch>    
+                <Route exact path="/maintenance" component={Maintenance} />
+                <Route path="/app" component={App} />
+            </Switch>
         </Router>
-        
+
     </Provider>, document.getElementById('root'));
 
 

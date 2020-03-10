@@ -1,6 +1,6 @@
 import {GET_CRNT_SRV_IMPL,GET_ANSWER_SURVEYOR,GET_SURVEYOR_BYSRV,GET_EMP_OWNER_BYSRV,GET_UNIT_OWNER_BYSRV,GET_SURVEY_SELECT, GET_QUESTIONS_BYGROUP,UPDATE_SURVEY,GET_1SURVEY,SAVE_SURVEY_ANSWER,GET_SURVEY_TASK_DETAIL,GET_SURVEY_TASKS,ADD_SURVEY,GET_UNITS,GET_USERS,GET_USERS_BYNAME,DELETE_QUESTION,ADD_QUESTION,ADD_QUESTION_GROUP,GET_QUESTION_GROUPS,LOGIN,GET_SURVEYS,
     GET_SURVEY_TITTLE} from '../actions/Types'
-import {setAssessmentDetail,getDataDoAssessmentSuccess,getUserNotAnsweringSuccess,getUsersByUnitSuccess,generalError,errorLogin,getUserAdminSuccess,getCrntSrvImplSuccess,getAnswerBySurveyorSuccess,getSurveyorsBySurveySuccess,getSurveySelectSuccess,getOneSurveySuccess,getSurveyTittleSuccess,lockMenu,getsurveyTaskDetailSuccess,getsurveyTasksSuccess,getUnitsSuccess,
+import {setSystemMaintenance, setAssessmentDetail,getDataDoAssessmentSuccess,getUserNotAnsweringSuccess,getUsersByUnitSuccess,generalError,errorLogin,getUserAdminSuccess,getCrntSrvImplSuccess,getAnswerBySurveyorSuccess,getSurveyorsBySurveySuccess,getSurveySelectSuccess,getOneSurveySuccess,getSurveyTittleSuccess,lockMenu,getsurveyTaskDetailSuccess,getsurveyTasksSuccess,getUnitsSuccess,
 getUsersByNameSuccess,getUsersSuccess,toggleSnackBar,getGroupSuccess,setUser,
 getSurveySuccess,getQuestionsByGroupSuccess,loadingGlobal,getEmpOwnersBySurveySuccess,getUnitOwnersBySurveySuccess, setSelectedSurveyors} from '../actions'
 import {call, put, takeEvery,takeLatest,all} from 'redux-saga/effects'
@@ -67,16 +67,26 @@ yield all([
 export function* login(action){
 yield put(lockMenu(true));
     try{
-        const response = yield call([axios,axios.post],api_url+'login',action.payload);
+        const params = {indicator:"system_maintenance"}
+        const systemMaintenance = yield call([axios,axios.get],api_url+'pa/setting/value',{params:params});
 
-        if(response.data==''){
+
+        yield put(setSystemMaintenance(systemMaintenance.data));
+
+
+        const user = yield call([axios,axios.post],api_url+'login',action.payload);
+
+        if(user.data==''){
             yield put(errorLogin('User not found'));
         }else{
-            yield put(setUser(response.data));
+            yield put(setUser(user.data));
             yield put(lockMenu(false));
         }
+
+
     }catch(error){
         console.log('error in saga login()')
+        console.log(error)
         yield put(generalError('ups, something wrong happened, please call the administrator'))
     }
 }

@@ -94,6 +94,7 @@ const PaSubAspekCreateComponent = props => {
         setAspek(e);
     };
 
+    const title = props.subaspek_to_edit ? "Edit Sub Aspek" : "Create New Sub Aspek"
     return (
         <Grid container direction="column">
             <Grid item xs={6} container>
@@ -103,7 +104,7 @@ const PaSubAspekCreateComponent = props => {
                         gutterBottom
                         className="animated slideInLeft"
                     >
-                        Create New Sub Aspek
+                        {title}
                     </Typography>
                 </Grid>
                 <Grid item xs={6}>

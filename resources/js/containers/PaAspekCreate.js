@@ -42,6 +42,7 @@ const PaAspekCreateComponent = props => {
     const [unsurs, setUnsurs] = useState([]);
     const [dataEmployees, setDataEmployees] = useState([]);
     const [masterOptions, setMasterOptions] = useState([])
+    const [surveyOptions, setSurveyOptions] = useState([])
     const [selectedPaMaster, setSelectedPaMaster] = useState(null)
     const [aspekWeight, setAspekWeight] = useState(0)
     const [masterTotalWeight, setMasterTotalWeight] = useState(0)
@@ -53,6 +54,7 @@ const PaAspekCreateComponent = props => {
         getDataEmployees()
         getDataMaster()
         getDataGroup()
+        getDataSurvey()
     }, [])
 
     useEffect(() => {
@@ -66,11 +68,21 @@ const PaAspekCreateComponent = props => {
     const { classes } = props;
 
 
+    const getDataSurvey = async() => {
+        const params={}
+        const response = await doGet('survey/select/',params)
+        if(response.data.length>0){
+            const dataForSelect = response.data.map(survey=>({value:survey.id, label:survey.judul}))
+            setSurveyOptions(dataForSelect)
+        }
+
+    }
+
     const getDataMaster = async () =>{
         const params={}
         const response = await doGet('pa/master',params)
         if(response.data.length>0){
-            const dataForSelect = response.data.map(master=>({value:master.id, label:`${master.name} - semester ${master.semester} - periode ${master.periode}`}))
+            const dataForSelect = response.data.map(master=>({value:master.id, label: master.name}))
             setMasterOptions(dataForSelect)
         }
 
@@ -363,7 +375,7 @@ const PaAspekCreateComponent = props => {
     }
 
 
-
+    const title = props.aspek_to_edit ? "Edit Aspek" : "Create New Aspek"
     return (
         <Grid container direction="column">
             <Grid container>
@@ -373,7 +385,7 @@ const PaAspekCreateComponent = props => {
                         gutterBottom
                         className="animated slideInLeft"
                     >
-                        Create New Aspek
+                        {title}
                     </Typography>
                 </Grid>
                 <Grid container spacing={8} >
@@ -739,9 +751,6 @@ const PaAspekCreateComponent = props => {
                 <MenuItem onClick={()=>setExternalData(null)}>No External Data</MenuItem>
                 <MenuItem onClick={()=>setExternalData("hris_ijin")}>Data HRIS Ijin</MenuItem>
                 <MenuItem onClick={()=>setExternalData("hris_absen")}>Data HRIS Absen</MenuItem>
-                <MenuItem onClick={()=>setExternalData("perspective_rekan")}>Data Customer Perspective Rekan</MenuItem>
-                <MenuItem onClick={()=>setExternalData("perspective_leader")}>Data Customer Perspective Atasan</MenuItem>
-                <MenuItem onClick={()=>setExternalData("perspective_staff")}>Data Customer Perspective Staff</MenuItem>
                 <MenuItem onClick={()=>setOpenChildMenu(!openChildMenu)}>
                     Data Input by HRD
                     {openChildMenu ? <ExpandLess /> : <ExpandMore />}
@@ -749,6 +758,16 @@ const PaAspekCreateComponent = props => {
                 <Collapse in={openChildMenu} timeout="auto" unmountOnExit>
                     {groupOptions.map(group=>(
                         <MenuItem onClick={()=>setExternalData(group.value)}>{group.value}</MenuItem>
+                    ))
+                    }
+                </Collapse>
+                <MenuItem onClick={()=>setOpenChildMenu(!openChildMenu)}>
+                    Data Survey
+                    {openChildMenu ? <ExpandLess /> : <ExpandMore />}
+                </MenuItem>
+                <Collapse in={openChildMenu} timeout="auto" unmountOnExit>
+                    {surveyOptions.map(survey=>(
+                        <MenuItem onClick={()=>setExternalData('survey-'+survey.value)}>{survey.label}</MenuItem>
                     ))
                     }
                 </Collapse>

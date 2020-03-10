@@ -99,142 +99,7 @@ import Collapse from '@material-ui/core/Collapse';
 
 
 
-const theme = createMuiTheme({
-  palette: {
-      primary: {
-                  main: indigo[500],
-                   },
-      secondary: { main: pink[500],
-                  },
 
-    },
-    typography: { useNextVariants: true },
-  });
-
-const drawerWidth = 245;
-const styles = theme => ({
-  root: {
-    display: 'flex',
-
-  },
-  toolbar: {
-    padding: '0px 24px 0px 80px', // keep right padding when drawer closed
-  },
-  toolbarIcon: {
-    display: 'flex',
-    alignItems: 'flex-start',
-    justifyContent: 'space-between',
-    padding: 0,
-    ...theme.mixins.toolbar,
-    color:'#FFFFFF',
-    height:48,
-  },
-  appBar: {
-    zIndex: theme.zIndex.drawer - 1,
-    transition: theme.transitions.create(['width', 'margin'], {
-      easing: theme.transitions.easing.sharp,
-      duration: theme.transitions.duration.leavingScreen,
-    }),
-    backgroundColor: 'transparent',
-    boxShadow:'none'
-
-  },
-  appBarShift: {
-    marginLeft: drawerWidth,
-    width: `calc(100% - ${drawerWidth}px)`,
-    transition: theme.transitions.create(['width', 'margin'], {
-      easing: theme.transitions.easing.sharp,
-      duration: theme.transitions.duration.enteringScreen,
-    }),
-
-  },
-  menuButton: {
-    marginLeft: 12,
-    marginRight: 36,
-  },
-  menuButtonHidden: {
-    display: 'none',
-  },
-
-  drawerPaper: {
-    position: 'relative',
-    whiteSpace: 'nowrap',
-    width: drawerWidth,
-    transition: theme.transitions.create('width', {
-      easing: theme.transitions.easing.sharp,
-      duration: theme.transitions.duration.enteringScreen,
-    }),
-    overflow: "auto",
-    height: "100%",
-    backgroundColor: 'transparent',
-    borderStyle:'none'
-
-  },
-  drawerPaperClose: {
-    overflowX: 'hidden',
-    transition: theme.transitions.create('width', {
-      easing: theme.transitions.easing.sharp,
-      duration: theme.transitions.duration.leavingScreen,
-    }),
-    width: theme.spacing.unit * 7,
-    [theme.breakpoints.up('sm')]: {
-      width: theme.spacing.unit * 7,
-    },
-  },
-  appBarSpacer: theme.mixins.toolbar,
-
-  content: {
-    display: 'flex',
-    flexGrow: 1,
-    padding: '24px 10px 0px 0px',
-    height: '91vh',
-    marginTop: theme.spacing.unit * 6,
-    justifyContent:'center',
-    backgroundColor: '#657de9',
-    overflow:'auto',
-    },
-
-  paperContent:{
-    padding: theme.spacing.unit*3,
-    marginBottom:'auto',
-    width: '100%',
-    minHeight:570
-  },
-
-  chartContainer: {
-    marginLeft: -22,
-  },
-  tableContainer: {
-    height: 320,
-  },
-  h5: {
-    marginBottom: theme.spacing.unit * 2,
-  },
-  toolButton: {
-    marginLeft: theme.spacing.unit * 2,
-    marginRight: theme.spacing.unit * 2,
-  },
-  toolButtonFirst: {
-    marginLeft: 'auto',
-    marginRight: theme.spacing.unit * 2,
-  },
-  profile : {
-    width : 250,
-    height : 'auto',
-    padding : 10
-  },
-  avatar:{
-    color: '#fff',
-    backgroundColor: '#3f51b5',
-  },
-  loadingGlobal:{
-    zIndex:2000,
-    position: 'fixed',
-    top: 0,
-    width:'100%',
-
-  }
-});
 
 class AppComponent extends Component {
 
@@ -294,8 +159,13 @@ class AppComponent extends Component {
 
   render() {
     let user = {emp_id:'',emp_name:''}
-    if(this.props.loggedUser.emp_id)
+
+    if(this.props.loggedUser.emp_id){
         user = this.props.loggedUser
+        if((1 === this.props.system.maintenance) && !['adm'].includes(this.props.loggedUser.role)){
+            return <Redirect to="/maintenance" />
+        }
+    }
     else
       return <Redirect to="/" />
 
@@ -558,6 +428,145 @@ AppComponent.propTypes = {
   classes : PropTypes.object.isRequired,
 };
 
+const theme = createMuiTheme({
+    palette: {
+        primary: {
+                    main: indigo[500],
+                     },
+        secondary: { main: pink[500],
+                    },
+
+      },
+      typography: { useNextVariants: true },
+    });
+
+  const drawerWidth = 245;
+  const styles = theme => ({
+    root: {
+      display: 'flex',
+
+    },
+    toolbar: {
+      padding: '0px 24px 0px 80px', // keep right padding when drawer closed
+    },
+    toolbarIcon: {
+      display: 'flex',
+      alignItems: 'flex-start',
+      justifyContent: 'space-between',
+      padding: 0,
+      ...theme.mixins.toolbar,
+      color:'#FFFFFF',
+      height:48,
+    },
+    appBar: {
+      zIndex: theme.zIndex.drawer - 1,
+      transition: theme.transitions.create(['width', 'margin'], {
+        easing: theme.transitions.easing.sharp,
+        duration: theme.transitions.duration.leavingScreen,
+      }),
+      backgroundColor: 'transparent',
+      boxShadow:'none'
+
+    },
+    appBarShift: {
+      marginLeft: drawerWidth,
+      width: `calc(100% - ${drawerWidth}px)`,
+      transition: theme.transitions.create(['width', 'margin'], {
+        easing: theme.transitions.easing.sharp,
+        duration: theme.transitions.duration.enteringScreen,
+      }),
+
+    },
+    menuButton: {
+      marginLeft: 12,
+      marginRight: 36,
+    },
+    menuButtonHidden: {
+      display: 'none',
+    },
+
+    drawerPaper: {
+      position: 'relative',
+      whiteSpace: 'nowrap',
+      width: drawerWidth,
+      transition: theme.transitions.create('width', {
+        easing: theme.transitions.easing.sharp,
+        duration: theme.transitions.duration.enteringScreen,
+      }),
+      overflow: "auto",
+      height: "100%",
+      backgroundColor: 'transparent',
+      borderStyle:'none'
+
+    },
+    drawerPaperClose: {
+      overflowX: 'hidden',
+      transition: theme.transitions.create('width', {
+        easing: theme.transitions.easing.sharp,
+        duration: theme.transitions.duration.leavingScreen,
+      }),
+      width: theme.spacing.unit * 7,
+      [theme.breakpoints.up('sm')]: {
+        width: theme.spacing.unit * 7,
+      },
+    },
+    appBarSpacer: theme.mixins.toolbar,
+
+    content: {
+      display: 'flex',
+      flexGrow: 1,
+      padding: '24px 10px 0px 0px',
+      height: '91vh',
+      marginTop: theme.spacing.unit * 6,
+      justifyContent:'center',
+      backgroundColor: '#657de9',
+      overflow:'auto',
+      },
+
+    paperContent:{
+      padding: theme.spacing.unit*3,
+      marginBottom:'auto',
+      width: '100%',
+      minHeight:570
+    },
+
+    chartContainer: {
+      marginLeft: -22,
+    },
+    tableContainer: {
+      height: 320,
+    },
+    h5: {
+      marginBottom: theme.spacing.unit * 2,
+    },
+    toolButton: {
+      marginLeft: theme.spacing.unit * 2,
+      marginRight: theme.spacing.unit * 2,
+    },
+    toolButtonFirst: {
+      marginLeft: 'auto',
+      marginRight: theme.spacing.unit * 2,
+    },
+    profile : {
+      width : 250,
+      height : 'auto',
+      padding : 10
+    },
+    avatar:{
+      color: '#fff',
+      backgroundColor: '#3f51b5',
+    },
+    loadingGlobal:{
+      zIndex:2000,
+      position: 'fixed',
+      top: 0,
+      width:'100%',
+
+    }
+  });
+
+
+
 const mapStateToProps = state => {
   return {
     isLeftDrawerOpen: state.ui.isLeftDrawerOpen,
@@ -567,7 +576,8 @@ const mapStateToProps = state => {
     snack_variant : state.ui.snack_variant,
     loadingGlobal : state.ui.loadingGlobal,
     lockMenu : state.ui.lockMenu,
-    loggedUser : state.user.user
+    loggedUser : state.user.user,
+    system : state.system,
   };
 };
 

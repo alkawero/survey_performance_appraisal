@@ -8,6 +8,7 @@ import { withStyles } from '@material-ui/core/styles'
 import IconButton from '@material-ui/core/IconButton'
 import Button from '@material-ui/core/Button'
 import PersonIcon from '@material-ui/icons/Person'
+import Done from '@material-ui/icons/Done'
 import GroupIcon from '@material-ui/icons/Group'
 import TextField from '@material-ui/core/TextField'
 import PrevIcon from '@material-ui/icons/NavigateBefore'
@@ -65,7 +66,7 @@ const styles = theme =>({
         fontSize:24,
     },
     reason:{
-        marginTop:10,        
+        marginTop:10,
     },
     errorComponent:{
         marginRight:'auto'
@@ -85,7 +86,10 @@ const styles = theme =>({
     font20:{
         fontSize:20,
     },
-    
+    selected:{
+        fontWeight:'bold'
+    }
+
 
 
   })
@@ -115,10 +119,10 @@ class SurveyTaskAnswerComponent extends Component {
     gotoNextQuestion = () =>{
         const max = this.props.currentTask.questions.length - 1
         const need_reason = this.props.currentTask.questions[this.state.currentQuestion].need_reason
-        
+
         //if((!need_reason) || (this.state.reasonMap.map((reason)=>(reason.questionId)).includes(this.props.currentTask.questions[this.state.currentQuestion].id))){
             this.setState({currentQuestion:this.state.currentQuestion!==max ? this.state.currentQuestion+1:max})
-        //}    
+        //}
     }
 
     gotoPrevQuestion = () =>{
@@ -146,7 +150,7 @@ class SurveyTaskAnswerComponent extends Component {
 
         this.setState({answerMap:newArray})
 
-        
+
     }
 
     isSelected(code,questionId){
@@ -179,10 +183,10 @@ class SurveyTaskAnswerComponent extends Component {
      }
 
      reasonOnChange = (e)=>{
-        //console.log(e.target.value) 
+        //console.log(e.target.value)
         let newReasonMap = []
         const questionId = this.props.currentTask.questions[this.state.currentQuestion].id
-        
+
         if(!_.isEmpty(this.state.reasonMap))
             newReasonMap = this.state.reasonMap.filter((reason)=>{
                 return reason.questionId !== questionId
@@ -192,7 +196,7 @@ class SurveyTaskAnswerComponent extends Component {
             let reasonObject = {questionId:questionId, reason:e.target.value}
             newReasonMap.push(reasonObject)
         }
-        
+
 
         this.setState({reasonMap:newReasonMap})
      }
@@ -200,19 +204,19 @@ class SurveyTaskAnswerComponent extends Component {
      submit = () => {
 
         //const need_reason = this.props.currentTask.questions[this.state.currentQuestion].need_reason
-        
+
         //if((!need_reason) || (this.state.reasonMap.map((reason)=>(reason.questionId)).includes(this.props.currentTask.questions[this.state.currentQuestion].id))){
             if(this.state.answerMap.length==this.props.currentTask.questions.length){
                 const emptyAnswers = this.state.answerMap.filter(answer => {
                     return answer.answer.trim() === ''
                 })
-        
-                
+
+
                 if(!_.isEmpty(emptyAnswers)){
                     this.setState({errors:emptyAnswers.map(answer=>answer.no+1)})
                 }else{
                     const answerFiltered = this.state.answerMap.map(answer => {
-                        
+
                         if(answer.type==='E'){
                             return {question_id:answer.questionId, text:answer.answer}
                         }
@@ -223,18 +227,18 @@ class SurveyTaskAnswerComponent extends Component {
                                 currentReason = this.state.reasonMap.filter((reason)=>{
                                     return reason.questionId === answer.questionId
                             })
-        
+
                             if(_.isEmpty(currentReason))
                                 currentReason = [{questionId:0,reason:''}]
-                            
+
                             if(answer.type==='M'){
                                 //return {question_id:answer.questionId, code:answer.answer}
                                 return {question_id:answer.questionId, code:answer.answer, text:currentReason[0].reason}
                             }else{
                                 //return {question_id:answer.questionId, score:answer.answer}
                                 return {question_id:answer.questionId, score:answer.answer, text:currentReason[0].reason}
-                            } 
-                            
+                            }
+
                         }
                      })
                     const data = {
@@ -246,18 +250,18 @@ class SurveyTaskAnswerComponent extends Component {
                 }
             }else{
                 const answeredQuestionNos = this.state.answerMap.map(ans=>(ans.no))
-                
+
                 //create new array Nomer mulai dari 0
                 let index=0
-                const arrayNomer = this.props.currentTask.questions.map(()=>(index++))                                    
+                const arrayNomer = this.props.currentTask.questions.map(()=>(index++))
                 //dicari yang nomernya tidak ada di answered
-                const notAnsweredNumber = arrayNomer.filter((no)=>(!answeredQuestionNos.includes(no)))                         
+                const notAnsweredNumber = arrayNomer.filter((no)=>(!answeredQuestionNos.includes(no)))
                 const notAnsweredNumberPlus1 = notAnsweredNumber.map((x)=>(++x))
                 //dikasih plus1 karena di answerMap no mulai dari 0
-                this.setState({errors:notAnsweredNumberPlus1})           
+                this.setState({errors:notAnsweredNumberPlus1})
             }
-            
-        //}                
+
+        //}
 
      }
 
@@ -290,7 +294,7 @@ class SurveyTaskAnswerComponent extends Component {
             question  = task.questions[currentQuestion].question
 
             const questionId = this.props.currentTask.questions[this.state.currentQuestion].id
-            
+
             if(!_.isEmpty(this.state.answerMap)){//get answer text
                 const answers  = this.state.answerMap.filter(answer=>{
                     return answer.questionId == questionId
@@ -312,18 +316,18 @@ class SurveyTaskAnswerComponent extends Component {
             }
 
             //if(this.state.answerMap.length===task.questions.length){
-                submitComponent =     <Button onClick={this.submit} size='small' color="primary" className={classes.button}>                                        
+                submitComponent =     <Button onClick={this.submit} size='small' color="primary" className={classes.button}>
                                         <SendIcon/>
                                         submit
-                                    </Button>                                    
+                                    </Button>
             //}
 
             const max = this.props.currentTask.questions.length - 1
             if(this.state.currentQuestion !== 0){
-                prevComponent =     <Button onClick={this.gotoPrevQuestion} size='small' color="primary" className={classes.button}>                                        
+                prevComponent =     <Button onClick={this.gotoPrevQuestion} size='small' color="primary" className={classes.button}>
                                         <PrevIcon  />
                                         previous
-                                    </Button>                                
+                                    </Button>
             }
             if(this.state.currentQuestion===max){
                 nextComponent = ''
@@ -364,18 +368,28 @@ class SurveyTaskAnswerComponent extends Component {
                 answerComponent =
                 <List component="nav" dense={true}>
                   {values.map(i =>
-                    <ListItem  button selected={this.isSelected(i,op.question_id)}
+                    <ListItem  button className={classes.selected} selected={this.isSelected(i,op.question_id)}
                         key={i}
                         onClick={()=>this.answering(i)}
                     >
-                        <ListItemText primary={<Typography type="body2" style={{ color: '#FFFFFF',fontSize:20 }}>
-                        {i} - {scoreText[i-1]}
-                        </Typography>} />
+                        <ListItemText primary={
+                            <Grid container alignItems="center" justify="space-between">
+                                <Typography type="body2" style={{ color: '#FFFFFF',fontSize:20 }}>
+                                {i} - {scoreText[i-1]}
+                                </Typography>
+                                {
+                                    this.isSelected(i,op.question_id) && <Done style={{ color: '#FFFFFF'}}/>
+                                }
+
+                            </Grid>
+                            }
+
+                        />
                     </ListItem>
                   )
                 }
                 </List>
-                
+
             }
             else{
                 answerHeader = 'Type your answer'
@@ -405,7 +419,7 @@ class SurveyTaskAnswerComponent extends Component {
                 </React.Fragment>
 
             }
-            
+
             if(task.questions[currentQuestion].need_reason===1){
                 reasonComponent =
                 <React.Fragment>
@@ -432,21 +446,23 @@ class SurveyTaskAnswerComponent extends Component {
                         }}
 
                         />
-                    </Paper>    
+                    </Paper>
                 </React.Fragment>
             }
-          
+
 
         if(!_.isEmpty(this.state.errors))
             errorComponent =<React.Fragment>
-                            <Grid item>
-                                <span className={classes.error}>please answer all question : </span>
+                            <Grid item container>
+                                <span className={classes.error}>please complete all of these questions, click the number : </span>
                             </Grid>
+                            <Grid item container>
                                 {this.state.errors.map(error=>
                                     <Grid item key={error} >
                                     <Button onClick={()=>this.errorClick(error-1)} className={classes.avatar}>{error}</Button>
                                     </Grid>
                                 )}
+                            </Grid>
 
                             </React.Fragment>
         return (
@@ -464,18 +480,18 @@ class SurveyTaskAnswerComponent extends Component {
 
                     </Typography>
                 </Grid>
-                <Grid item xs={1} container justify='center'>
+                <Grid item xs={1} container alignItems="center" justify='center'>
                     {prevComponent}
                 </Grid>
-                <Grid item xs={1} container justify='center'>
+                <Grid item xs={1} container alignItems="center" justify='center'>
                     <IconButton onClick={this.gotoFirstQuestion}  color="primary" aria-label="Detail" >
                            <ReplayIcon  />
                     </IconButton>
                 </Grid>
-                <Grid item xs={1} container justify='center'>
+                <Grid item xs={1} container alignItems="center" justify='center'>
                     {nextComponent}
                 </Grid>
-                <Grid item xs={1} container justify='center'>
+                <Grid item xs={1} container alignItems="center" justify='center'>
                     {submitComponent}
                 </Grid>
             </Grid>
@@ -496,15 +512,15 @@ class SurveyTaskAnswerComponent extends Component {
             </Grid>
 
 
-            <Grid container direction='row' alignItems='center' justify='flex-end' className={classes.reason}>
-                
+            <Grid container direction='row' alignItems='baseline' justify='flex-end' className={classes.reason}>
+
                 <Grid item xs={6} className={classes.errorComponent}>
                     {errorComponent}
                 </Grid>
-                <Grid item xs={4}>                
+                <Grid item xs={4}>
                     {reasonComponent}
                 </Grid>
-                    
+
             </Grid>
         </Grid>
 

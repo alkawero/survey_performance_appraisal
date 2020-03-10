@@ -130,6 +130,7 @@ const PaUnsurCreateComponent = props => {
         setSubAspek(e);
     };
 
+    const title = props.unsur_to_edit ? "Edit Unsur" : "Create New Unsur"
     return (
         <Grid container direction="column">
             <Grid item xs={6} container>
@@ -139,7 +140,7 @@ const PaUnsurCreateComponent = props => {
                         gutterBottom
                         className="animated slideInLeft"
                     >
-                        Create New Unsur
+                        {title}
                     </Typography>
                 </Grid>
 

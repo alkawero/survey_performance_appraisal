@@ -39,6 +39,8 @@ const SystemSettingComponent = (props) =>{
     const [semester, setSemester] = useState("");
     const [appraisalStartDate, setAppraisalStartDate] = useState(new Date())
     const [appraisalEndDate, setAppraisalEndDate] = useState(new Date())
+    const [appraisalAbsenStartDate, setAppraisalAbsenStartDate] = useState(new Date())
+    const [appraisalAbsenEndDate, setAppraisalAbsenEndDate] = useState(new Date())
     const semesterOptions = [
         { value: 1, label: "Semester 1" },
         { value: 2, label: "Semester 2" }
@@ -71,6 +73,12 @@ const SystemSettingComponent = (props) =>{
                     case "appraisal_end_date":
                         setAppraisalEndDate(new Date(element.value))
                         break;
+                    case "appraisal_absen_start_date":
+                        setAppraisalAbsenStartDate(new Date(element.value))
+                        break;
+                    case "appraisal_absen_end_date":
+                        setAppraisalAbsenEndDate(new Date(element.value))
+                        break;
 
 
                     default:
@@ -96,6 +104,14 @@ const SystemSettingComponent = (props) =>{
         setAppraisalEndDate(date)
     }
 
+    const handleAppraisalAbsenStartChange = date => {
+        setAppraisalAbsenStartDate(date)
+    }
+
+    const handleAppraisalAbsenEndChange = date => {
+        setAppraisalAbsenEndDate(date)
+    }
+
     const isSystemMaintenanceChange = e => {
         setIsSystemMaintenance(!isSystemMaintenance);
     };
@@ -108,7 +124,9 @@ const SystemSettingComponent = (props) =>{
                 {indicator:'periode_active', value : periode},
                 {indicator:'semester_active', value :  semester.value},
                 {indicator:'appraisal_end_date', value : format(appraisalEndDate, "yyyy-MM-dd")},
-                {indicator:'appraisal_start_date', value  : format(appraisalStartDate, "yyyy-MM-dd")}
+                {indicator:'appraisal_start_date', value  : format(appraisalStartDate, "yyyy-MM-dd")},
+                {indicator:'appraisal_absen_end_date', value : format(appraisalAbsenEndDate, "yyyy-MM-dd")},
+                {indicator:'appraisal_absen_start_date', value  : format(appraisalAbsenStartDate, "yyyy-MM-dd")}
             ],
             updated_by: props.user.emp_id
         }
@@ -156,6 +174,7 @@ const SystemSettingComponent = (props) =>{
 
                     <Grid item>
                         <DatePicker
+                            format="dd MMMM yyyy"
                             margin="normal"
                             label="Appraisal Start"
                             value={appraisalStartDate}
@@ -165,10 +184,38 @@ const SystemSettingComponent = (props) =>{
 
                     <Grid item>
                         <DatePicker
+                            format="dd MMMM yyyy"
                             margin="normal"
                             label="Appraisal End"
                             value={appraisalEndDate}
                             onChange={handleAppraisalEndDateChange}
+                        />
+                    </Grid>
+
+
+                    </Grid>
+                </MuiPickersUtilsProvider>
+
+                <MuiPickersUtilsProvider    utils={DateFnsUtils}>
+                    <Grid container spacing={16}>
+
+                    <Grid item>
+                        <DatePicker
+                            format="dd MMMM yyyy"
+                            margin="normal"
+                            label="Get Appraisal Absen From"
+                            value={appraisalAbsenStartDate}
+                            onChange={handleAppraisalAbsenStartChange}
+                        />
+                    </Grid>
+
+                    <Grid item>
+                        <DatePicker
+                            format="dd MMMM yyyy"
+                            margin="normal"
+                            label="Get Appraisal Absen Until"
+                            value={appraisalAbsenEndDate}
+                            onChange={handleAppraisalAbsenEndChange}
                         />
                     </Grid>
 

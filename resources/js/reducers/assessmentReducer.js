@@ -23,6 +23,10 @@ export default function assessmentReducer(state = initialState, action) {
             return produce(state, draft =>{
                 draft.aspek_to_edit= action.payload;
             })
+      case "UNSET_ASPEK_EDIT":
+      const  { aspek_to_edit, ...unsetted } = state;
+      return unsetted;
+
     case "SET_SUBASPEK_EDIT":
         return produce(state, draft =>{
             draft.subaspek_to_edit= action.payload;

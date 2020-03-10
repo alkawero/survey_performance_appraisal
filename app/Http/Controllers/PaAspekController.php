@@ -16,15 +16,17 @@ class PaAspekController extends Controller
     public function getByParams(Request $request){
 
         $aspeks ;
-        if($request->user_id){
-            $aspek_ids = PaAspekDetailer::select("aspek_id")->where('detailer_id',$request->user_id)->get();
-            $aspeks = PaAspek::whereIn("id",$aspek_ids) ;
-
-        }
 
         $aspeks = PaAspek::when($request->is_custom!==null, function ($query) use ($request) {
             return $query->where('is_custom', $request->is_custom);
         });
+
+        if($request->user_id){
+            $aspek_ids = PaAspekDetailer::select("aspek_id")->where('detailer_id',$request->user_id)->get();
+            $aspeks = $aspeks->whereIn("id",$aspek_ids) ;
+        }
+
+
 
         if($request->rowsPerPage)
         return AspekResource::collection($aspeks->paginate($request->rowsPerPage));
@@ -99,5 +101,25 @@ class PaAspekController extends Controller
                 );
             }
         }
+    }
+
+
+    public function deleteById(Request $request){
+        $subAspekIds = DB::table('pa_sub_aspeks')->where('aspek_id', $request->id)->pluck('id');
+        $unsurIds = DB::table('pa_unsurs')->whereIn('sub_aspek_id', $subAspekIds)->pluck('id');
+
+        DB::table('aspek_detailers')->where('aspek_id', $request->id)->delete();
+        DB::table('masters_aspeks')->where('aspek_id', $request->id)->delete();
+        DB::table('aspek_scores')->where('aspek_id', $request->id)->delete();
+        DB::table('aspek_to_users')->where('aspek_id', $request->id)->delete();
+        DB::table('sub_aspek_scores')->whereIn('sub_aspek_id', $subAspekIds)->delete();
+        DB::table('sub_aspek_to_users')->whereIn('sub_aspek_id', $subAspekIds)->delete();
+        DB::table('assessment_unsur_scores')->whereIn('unsur_id', $unsurIds)->delete();
+        DB::table('pa_master_bobot_unsur')->whereIn('unsur_id', $unsurIds)->delete();
+        DB::table('pa_scores')->whereIn('unsur_id', $unsurIds)->delete();
+        DB::table('unsur_to_users')->whereIn('unsur_id', $unsurIds)->delete();
+        DB::table('pa_unsurs')->whereIn('sub_aspek_id', $subAspekIds)->delete();
+        DB::table('pa_sub_aspeks')->where('aspek_id', $request->id)->delete();
+        DB::table('pa_aspeks')->where('id', $request->id)->delete();
     }
 }

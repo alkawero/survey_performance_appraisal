@@ -35,9 +35,11 @@ const PaAssessmentComponent = props => {
 
     const [dataTable, setDataTable] = useState([]);
     const [masterOptions, setMasterOptions] = useState([])
+    const [periodeOptions, setPeriodeOptions] = useState([])
     const [expandFilter, setExpandFilter] = useState(false)
     const [selectedPaMaster, setSelectedPaMaster] = useState(null)
     const [selectedParticipants, setSelectedParticipants] = useState([])
+    const [selectedPeriode, setSelectedPeriode] = useState(null)
     const [participantOptions, setParticipantOptions] = useState([])
     const [unitParticipantOptions, setUnitParticipantOptions] = useState([])
     const [selectedUnitParticipant, setSelectedUnitParticipant] = useState(null)
@@ -58,6 +60,7 @@ const PaAssessmentComponent = props => {
 
     useEffect(() => {
         getDataMaster()
+        getDataPeriode()
         getDataParticipants()
         getData(page,filterParams)
         getDataUnit()
@@ -77,11 +80,22 @@ const PaAssessmentComponent = props => {
 
     }
 
+    const getDataPeriode = async () =>{
+        const params={}
+        const response = await doGet('pa/assessment/periodes',params)
+        if(response.data.length>0){
+            const dataForSelect = response.data.map(periode=>({value:periode, label:periode}))
+            setPeriodeOptions(dataForSelect)
+        }
+
+    }
+
     const filter = async () => {
         const params = {
             participant_ids: selectedParticipants.length > 0 ? selectedParticipants.map(p=>(p.value)):null,
             master_id : selectedPaMaster!==null ? selectedPaMaster.value : null,
-            unit_id : selectedUnitParticipant!==null ? selectedUnitParticipant.value : null
+            unit_id : selectedUnitParticipant!==null ? selectedUnitParticipant.value : null,
+            periode : selectedPeriode!==null ? selectedPeriode.value : null
         };
         setFilterParams(params)
         getData(page,params)
@@ -132,6 +146,10 @@ const PaAssessmentComponent = props => {
 
     const participantsOnChange = (e) =>{
         setSelectedParticipants(e)
+    }
+
+    const periodeOnChange = (e) =>{
+        setSelectedPeriode(e)
     }
 
 
@@ -225,29 +243,18 @@ const PaAssessmentComponent = props => {
                                 <>
                                     <Grid item xs={4}>
                                         <Select
-                                            options={masterOptions}
-                                            value={selectedPaMaster}
-                                            onChange={masterOnChange}
-                                            placeholder='Select PA Master'
+                                            options={periodeOptions}
+                                            value={selectedPeriode}
+                                            onChange={periodeOnChange}
+                                            placeholder='Select periode'
+                                            isClearable
                                             />
                                     </Grid>
                                     <Grid item xs={4}>
-                                        <Select
-                                            isMulti
-                                            name="participants"
-                                            value={selectedParticipants}
-                                            onChange={participantsOnChange}
-                                            options={participantOptions}
-                                            placeholder='Select the participants'/>
+
                                     </Grid>
                                     <Grid item xs={4}>
-                                        <Select
-                                            name="unit_participants"
-                                            value={selectedUnitParticipant}
-                                            onChange={unitParticipantOnChange}
-                                            options={unitParticipantOptions}
-                                            placeholder='Select Department'
-                                        />
+
                                     </Grid>
                                 </>
                             }
@@ -260,7 +267,7 @@ const PaAssessmentComponent = props => {
                             </IconButton>
                         </Grid>
 
-                        <Grid item xs={2} container justify="flex-end">
+                        <Grid item xs={2} container justify="flex-end" alignItems='baseline'>
                             <IconButton  onClick={filter} color="primary" aria-label="search">
                                 <Search />
                             </IconButton>

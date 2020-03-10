@@ -1,10 +1,10 @@
-import React, { Component } from "react";
+import React, { useState, useEffect } from "react";
+import { doGet,doPatch } from "../services/api-service";
 import { connect } from "react-redux";
 import {
     clearSurvey,
     toggleActiveSurvey,
     getOneSurvey,
-    getSurveys
 } from "../actions";
 import Typography from "@material-ui/core/Typography";
 import { withStyles } from "@material-ui/core/styles";
@@ -15,22 +15,17 @@ import Fab from "@material-ui/core/Fab";
 import AddIcon from "@material-ui/icons/Add";
 import EditIcon from "@material-ui/icons/Edit";
 import DoneIcon from "@material-ui/icons/Done";
-import SendIcon from "@material-ui/icons/Send";
+import Search from "@material-ui/icons/Search";
 import Table from "@material-ui/core/Table";
 import TableBody from "@material-ui/core/TableBody";
 import TableCell from "@material-ui/core/TableCell";
 import TableHead from "@material-ui/core/TableHead";
 import TableRow from "@material-ui/core/TableRow";
+import TableFooter  from '@material-ui/core/TableFooter';
+import TablePagination   from '@material-ui/core/TablePagination';
 import Grid from "@material-ui/core/Grid";
-import Dialog from "@material-ui/core/Dialog";
-import DialogActions from "@material-ui/core/DialogActions";
-import DialogContent from "@material-ui/core/DialogContent";
-import DialogContentText from "@material-ui/core/DialogContentText";
-import DialogTitle from "@material-ui/core/DialogTitle";
 import Switch from "@material-ui/core/Switch";
 import Select from "react-select";
-//import {  } from './../actions/index';
-import concat from "lodash/concat";
 
 const options = [
     { value: "chocolate", label: "Chocolate" },
@@ -38,124 +33,75 @@ const options = [
     { value: "vanilla", label: "Vanilla" }
 ];
 
-const styles = theme => ({
-    button_mini: {
-        width: 30,
-        height: 30,
-        padding: 0
-    },
-    selectFilter: {
-        marginTop: 5
-    },
-    container: {
-        margin: -16
-    },
-    widthAction: {
-        minWidth: 180
-    },
-    widthDate: {
-        minWidth: 150
-    },
-    switchIcon: {
-        height: 10,
-        width: 10,
-        color: "#ffffff"
-    },
-    fab: {
-        marginTop: -30
-    },
-    tableWrapper: {
-        overflow: "auto"
-    },
-    table: {
-        border: "solid 1px RGB(204, 204, 204)",
-        borderRadius: 5,
-        display: "inline-block",
-        width: "-webkit-fill-available"
-    }
-});
 
-class SurveyComponent extends Component {
-    constructor(props) {
-        super(props);
-        this.state = {
-            modalDelete: false,
-            filterOpen: false
-        };
+
+const SurveyComponent = props =>{
+    const [dataSurvey, setDataSurvey] = useState([])
+    const [expandFilter, setExpandFilter] = useState(false)
+    const [rowsPerPage, setRowsPerPage] = useState(10)
+    const [page, setPage] = useState(1)
+    const [totalRows, setTotalRows] = useState(0)
+    const [filterParams, setFilterParams] = useState({})
+
+
+    useEffect(() => {
+        getDataSurvey(page,filterParams)
+    }, []);
+
+    useEffect(() => {
+        getDataSurvey(page,filterParams)
+    }, [rowsPerPage])
+
+    const changePage=(event, newPage)=>{
+        setPage(newPage+1)
+        getDataSurvey(newPage+1,filterParams)
     }
 
-    componentDidMount() {
-        this.props.getSurveys();
+    const changeRowsPerPage = (event)=> {
+        setRowsPerPage(+event.target.value);
+        setPage(1);
     }
 
-    componentWillUnmount() {
-        this.props.clearSurvey();
+    const getDataSurvey = async (toPage, filterParams) =>{
+        let params={
+            page:toPage,
+            rowsPerPage:rowsPerPage
+        }
+
+        if(filterParams)
+        params = {...params, ...filterParams}
+
+        const response = await doGet('survey',params)
+
+        setDataSurvey(response.data.data)
+        setPage(response.data.current_page)
+        setTotalRows(response.data.total)
+
+
     }
 
-    toggleFIlter = () => {
-        this.setState({ filterOpen: !this.state.filterOpen });
-    };
-
-    handleClose() {
-        this.setState({ modalDelete: false });
-    }
-
-    handleDelete() {
-        this.setState({ modalDelete: false });
-    }
-
-    getSurveyDetail(surveyId) {
-        this.props.getOneSurvey(surveyId);
+    const getSurveyDetail = (surveyId) =>{
+        props.getOneSurvey(surveyId);
         history.push("/app/survey/edit");
     }
 
-    toggleActive = srvId => {
-        this.props.toggleActiveSurvey(srvId);
+    const toggleActive = async (srvId) => {
+        await doPatch('survey/toggle/'+srvId,{});
+        filter()
     };
 
-    render() {
-        let dataSurvey = [];
 
-        //digabung Survey dan assesment
-        if (this.props.surveyPaginate.data)
-            dataSurvey = concat(dataSurvey, this.props.surveyPaginate.data);
+    const filter = async () => {
+        const params = {
 
-        const { classes } = this.props;
-        const renderFilter = (
-            <Grid container justify="flex-end" spacing={16}>
-                <Grid item xs={2}>
-                    <Select
-                        options={options}
-                        className={classes.selectFilter}
-                    />
-                </Grid>
+        };
+        setFilterParams(params)
+        getDataSurvey(page,params)
+    };
 
-                <Grid item xs={2}>
-                    <Select
-                        options={options}
-                        className={classes.selectFilter}
-                    />
-                </Grid>
 
-                <Grid item xs={2}>
-                    <Select
-                        options={options}
-                        className={classes.selectFilter}
-                    />
-                </Grid>
 
-                <Grid item xs={1}>
-                    <IconButton
-                        onClick={() => this.toggleFIlter()}
-                        color="primary"
-                        aria-label="Go"
-                        size="small"
-                    >
-                        <SendIcon />
-                    </IconButton>
-                </Grid>
-            </Grid>
-        );
+    const { classes } = props;
 
         return (
             <React.Fragment>
@@ -190,7 +136,37 @@ class SurveyComponent extends Component {
                             </Fab>
                         </Grid>
 
-                        {this.state.filterOpen == true && renderFilter}
+                        <Grid container spacing={8} className={classes.filterContainer} >
+                        <Grid item spacing={8} xs={9}container>
+                            <Grid item xs={4}>
+                            </Grid>
+                            <Grid item xs={4}>
+                            </Grid>
+                            <Grid item xs={4}>
+                            </Grid>
+                            {
+                                expandFilter &&
+                                <>
+                                    <Grid item xs={4}>
+                                    </Grid>
+                                    <Grid item xs={4}>
+                                    </Grid>
+                                    <Grid item xs={4}>
+                                    </Grid>
+                                </>
+                            }
+
+                        </Grid>
+                        <Grid item xs={1}>
+
+                        </Grid>
+
+                        <Grid item xs={2} container justify="flex-end" alignItems='baseline'>
+                            <IconButton  onClick={filter} color="primary" aria-label="search">
+                                <Search />
+                            </IconButton>
+                        </Grid>
+                    </Grid>
 
                         <Grid item xs={12} className={classes.tableWrapper}>
                             <div className={classes.table}>
@@ -241,7 +217,7 @@ class SurveyComponent extends Component {
                                                             }
                                                             color="primary"
                                                             onChange={() =>
-                                                                this.toggleActive(
+                                                                toggleActive(
                                                                     row.id
                                                                 )
                                                             }
@@ -250,7 +226,7 @@ class SurveyComponent extends Component {
                                                     <TableCell align="center">
                                                         <IconButton
                                                             onClick={() =>
-                                                                this.getSurveyDetail(
+                                                                getSurveyDetail(
                                                                     row.id
                                                                 )
                                                             }
@@ -265,58 +241,88 @@ class SurveyComponent extends Component {
                                             );
                                         })}
                                     </TableBody>
+                                    <TableFooter>
+                                    <tr>
+                                        <td colspan="10">
+                                            <Grid container justify="flex-end">
+                                                <Grid item>
+                                                <TablePagination
+                                                    rowsPerPageOptions={[5, 10, 25]}
+                                                    component="div"
+                                                    count={totalRows}
+                                                    rowsPerPage={rowsPerPage}
+                                                    page={page-1}
+                                                    backIconButtonProps={{
+                                                        'aria-label': 'previous page',
+                                                    }}
+                                                    nextIconButtonProps={{
+                                                        'aria-label': 'next page',
+                                                    }}
+                                                    onChangePage={changePage}
+                                                    onChangeRowsPerPage={changeRowsPerPage}
+                                                />
+                                                </Grid>
+                                            </Grid>
+                                        </td>
+                                    </tr>
+
+                                </TableFooter>
                                 </Table>
                             </div>
                         </Grid>
                     </Grid>
                 </Grid>
 
-                <Dialog
-                    open={this.state.modalDelete}
-                    onClose={() => this.handleClose}
-                    aria-labelledby="alert-dialog-title"
-                    aria-describedby="alert-dialog-description"
-                >
-                    <DialogTitle id="alert-dialog-title">
-                        {"Delete confirmation ?"}
-                    </DialogTitle>
-                    <DialogContent>
-                        <DialogContentText id="alert-dialog-description">
-                            Apakah anda yakin akan menghapus data tersebut ?
-                        </DialogContentText>
-                    </DialogContent>
-                    <DialogActions>
-                        <Button
-                            onClick={() => this.handleDelete()}
-                            color="secondary"
-                        >
-                            Delete
-                        </Button>
-                        <Button
-                            onClick={() => this.handleClose()}
-                            color="primary"
-                            variant="contained"
-                            autoFocus
-                        >
-                            Cancel
-                        </Button>
-                    </DialogActions>
-                </Dialog>
+
             </React.Fragment>
         );
-    }
 }
+
+const styles = theme => ({
+    button_mini: {
+        width: 30,
+        height: 30,
+        padding: 0
+    },
+    selectFilter: {
+        marginTop: 5
+    },
+    container: {
+        margin: -16
+    },
+    widthAction: {
+        minWidth: 180
+    },
+    widthDate: {
+        minWidth: 150
+    },
+    switchIcon: {
+        height: 10,
+        width: 10,
+        color: "#ffffff"
+    },
+    fab: {
+        marginTop: -30
+    },
+    tableWrapper: {
+        overflow: "auto"
+    },
+    table: {
+        border: "solid 1px RGB(204, 204, 204)",
+        borderRadius: 5,
+        display: "inline-block",
+        width: "-webkit-fill-available"
+    }
+});
 
 const mapStateToProps = state => {
     return {
-        surveyPaginate: state.survey.surveyPaginate,
         user: state.user.user
     };
 };
 
 const mapDispatchToProps = dispatch => {
     return {
-        getSurveys: () => dispatch(getSurveys()),
         getOneSurvey: surveyId => dispatch(getOneSurvey(surveyId)),
         toggleActiveSurvey: srvId => dispatch(toggleActiveSurvey(srvId)),
         clearSurvey: () => dispatch(clearSurvey())
