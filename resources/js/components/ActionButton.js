@@ -9,7 +9,7 @@ const ActionButton = (props) => {
         if(props.for.includes(props.role)){
             if(props.type==='icon-button'){
                 return(
-                    <Tooltip open={props.tooltip===true} title={props.title}>
+                    <Tooltip title={props.title}>
                         <IconButton disabled ={props.disabled} onClick={props.action} size="small" color="primary" >
                             {props.icon}
                         </IconButton>

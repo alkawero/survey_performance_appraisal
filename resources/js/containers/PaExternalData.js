@@ -299,6 +299,7 @@ const PaExternalDataComponent = props => {
                                                     {!editedData.id &&
                                                     <>
                                                     <ActionButton
+                                                        title="edit"
                                                         type='icon-button'
                                                         for={['adm']}
                                                         role={props.user.role}
@@ -307,7 +308,8 @@ const PaExternalDataComponent = props => {
                                                     />
                                                         {tobeDelete!==row.id &&
                                                             <ActionButton
-                                                                    type='icon-button'
+                                                            title="delete"
+                                                            type='icon-button'
                                                                     for={['adm']}
                                                                     role={props.user.role}
                                                                     action={()=>confirmDelete(row.id)}
@@ -318,7 +320,6 @@ const PaExternalDataComponent = props => {
                                                             <>are you sure ?
                                                             <ClickAwayListener onClickAway={()=>setTobeDelete(0)}>
                                                                     <ActionButton
-                                                                        tooltip={true}
                                                                         title="click again to delete"
                                                                         type='icon-button'
                                                                         for={['adm']}
@@ -334,6 +335,7 @@ const PaExternalDataComponent = props => {
 
                                                     {editedData.id===row.id &&
                                                     <ActionButton
+                                                        title="done"
                                                         type='icon-button'
                                                         for={['adm']}
                                                         role={props.user.role}

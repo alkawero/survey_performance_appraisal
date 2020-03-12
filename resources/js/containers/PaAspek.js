@@ -176,11 +176,12 @@ const PaAspekComponent = (props) => {
                                                 <TableCell align="center">
                                                 {row.created_by_name}
                                                 </TableCell>
-                                                <TableCell align="center">
+                                                <TableCell align="center" >
                                                 {row.status_value}
                                                 </TableCell>
                                                 <TableCell align="left" style={{width:250}}>
                                                 <ActionButton
+                                                    title="enter"
                                                     type="icon-button"
                                                     for={["ldr"]}
                                                     role={props.user.role}
@@ -189,6 +190,7 @@ const PaAspekComponent = (props) => {
                                                     icon={<InputIcon fontSize="small" />}
                                                 />
                                                 <ActionButton
+                                                    title="edit"
                                                     type='icon-button'
                                                     for={['adm']}
                                                     role={props.user.role}
@@ -197,18 +199,18 @@ const PaAspekComponent = (props) => {
 
                                                     {tobeDelete!==row.id &&
                                                         <ActionButton
-                                                                type='icon-button'
-                                                                for={['adm']}
-                                                                role={props.user.role}
-                                                                action={()=>confirmDelete(row.id)}
-                                                                icon={<Delete />}
+                                                            title="delete"
+                                                            type='icon-button'
+                                                            for={['adm']}
+                                                            role={props.user.role}
+                                                            action={()=>confirmDelete(row.id)}
+                                                            icon={<Delete />}
                                                         />
                                                     }
                                                     {tobeDelete===row.id &&
                                                         <>are you sure ?
                                                         <ClickAwayListener onClickAway={()=>setTobeDelete(0)}>
                                                                 <ActionButton
-                                                                    tooltip={true}
                                                                     title="click again to delete"
                                                                     type='icon-button'
                                                                     for={['adm']}

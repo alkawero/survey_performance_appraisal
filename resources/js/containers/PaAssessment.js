@@ -334,6 +334,7 @@ const PaAssessmentComponent = props => {
                                                 </TableCell>
                                                 <TableCell align="center">
                                                     <ActionButton
+                                                        title="detail"
                                                         type="icon-button"
                                                         for={["adm"]}
                                                         role={props.user.role}

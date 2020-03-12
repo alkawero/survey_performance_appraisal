@@ -7,9 +7,7 @@ import { withStyles } from "@material-ui/core/styles";
 import history from "../history.js";
 import IconButton from "@material-ui/core/IconButton";
 import Button from "@material-ui/core/Button";
-import Fab from "@material-ui/core/Fab";
-import AddIcon from "@material-ui/icons/Add";
-import EditIcon from "@material-ui/icons/Edit";
+import RefreshIcon from '@material-ui/icons/Refresh';
 import DoneIcon from "@material-ui/icons/Done";
 import PriorityHigh from "@material-ui/icons/PriorityHigh";
 import Visibility from "@material-ui/icons/Visibility";
@@ -57,6 +55,11 @@ const PaMyAssessmentComponent = props => {
         getData(page,filterParams)
     }, [rowsPerPage])
 
+
+    const btnRefresh = ()=>{
+        getData(page,filterParams)
+    }
+
     const getData = async (toPage, filterParams) =>{
         let params={
             page:toPage,
@@ -86,6 +89,7 @@ const PaMyAssessmentComponent = props => {
             user_id == row.owner && row.fill_by_staff == 1){
             return (
                     <ActionButton
+                    title="detail"
                     type="icon-button"
                     for={["usr","adm","ldr"]}
                     role={props.user.role}
@@ -97,6 +101,7 @@ const PaMyAssessmentComponent = props => {
         }else{
             return(
                 <ActionButton
+                    title="enter"
                     type="icon-button"
                     for={["usr", "adm","ldr"]}
                     role={props.user.role}
@@ -151,6 +156,19 @@ const PaMyAssessmentComponent = props => {
                         >
                             Assessment List
                         </Typography>
+                    </Grid>
+
+                    <Grid item  xs={2} align="right">
+                        <ActionButton
+                             type='fab'
+                             title="refresh"
+                             tooltip={true}
+                             for={['adm','usr','ldr']}
+                             role={props.user.role}
+                             action={btnRefresh}
+                             icon={<RefreshIcon />}
+                             class={classes.fab}/>
+
                     </Grid>
 
                     <Grid item xs={12} className={classes.tableWrapper}>
