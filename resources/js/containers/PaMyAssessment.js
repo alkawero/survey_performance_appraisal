@@ -106,7 +106,7 @@ const PaMyAssessmentComponent = props => {
                     for={["usr", "adm","ldr"]}
                     role={props.user.role}
                     action={() =>doAssessment(row.id)}
-                    disabled={row.active === 0}
+                    disabled={row.active === 0 || row.status_value==="expired"}
                     icon={<InputIcon fontSize="small" />}
                 />
             )
@@ -162,7 +162,6 @@ const PaMyAssessmentComponent = props => {
                         <ActionButton
                              type='fab'
                              title="refresh"
-                             tooltip={true}
                              for={['adm','usr','ldr']}
                              role={props.user.role}
                              action={btnRefresh}
@@ -266,34 +265,7 @@ const PaMyAssessmentComponent = props => {
                 </Grid>
             </Grid>
 
-            <Dialog
-                open={false}
-                onClose={() => {}}
-                aria-labelledby="alert-dialog-title"
-                aria-describedby="alert-dialog-description"
-            >
-                <DialogTitle id="alert-dialog-title">
-                    {"Delete confirmation ?"}
-                </DialogTitle>
-                <DialogContent>
-                    <DialogContentText id="alert-dialog-description">
-                        Apakah anda yakin akan menghapus data tersebut ?
-                    </DialogContentText>
-                </DialogContent>
-                <DialogActions>
-                    <Button onClick={() => {}} color="secondary">
-                        Delete
-                    </Button>
-                    <Button
-                        onClick={() => {}}
-                        color="primary"
-                        variant="contained"
-                        autoFocus
-                    >
-                        Cancel
-                    </Button>
-                </DialogActions>
-            </Dialog>
+
         </React.Fragment>
     );
 };

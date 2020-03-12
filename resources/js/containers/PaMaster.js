@@ -111,34 +111,7 @@ const PaMasterComponent = props => {
                 </Grid>
             </Grid>
 
-            <Dialog
-                open={false}
-                onClose={() => {}}
-                aria-labelledby="alert-dialog-title"
-                aria-describedby="alert-dialog-description"
-            >
-                <DialogTitle id="alert-dialog-title">
-                    {"Delete confirmation ?"}
-                </DialogTitle>
-                <DialogContent>
-                    <DialogContentText id="alert-dialog-description">
-                        Apakah anda yakin akan menghapus data tersebut ?
-                    </DialogContentText>
-                </DialogContent>
-                <DialogActions>
-                    <Button onClick={() => {}} color="secondary">
-                        Delete
-                    </Button>
-                    <Button
-                        onClick={() => {}}
-                        color="primary"
-                        variant="contained"
-                        autoFocus
-                    >
-                        Cancel
-                    </Button>
-                </DialogActions>
-            </Dialog>
+
         </React.Fragment>
     );
 };

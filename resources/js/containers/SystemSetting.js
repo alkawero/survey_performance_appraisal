@@ -2,7 +2,7 @@ import React, {useState,useEffect} from 'react'
 import { doGet,doPatch } from "../services/api-service";
 import { withStyles } from '@material-ui/core/styles';
 import { connect } from "react-redux";
-
+import {loadingGlobal} from "../actions"
 import Typography from '@material-ui/core/Typography';
 import Grid from '@material-ui/core/Grid';
 import Button from '@material-ui/core/Button';
@@ -118,6 +118,7 @@ const SystemSettingComponent = (props) =>{
 
     const apply = async() => {
         setProcessing(true)
+        props.loadingGlobal(true)
         const params = {
             settings :    [
                 {indicator:'system_maintenance', value : isSystemMaintenance},
@@ -132,6 +133,7 @@ const SystemSettingComponent = (props) =>{
         }
         await doPatch('pa/setting',params,'update setting data')
         setProcessing(false)
+        props.loadingGlobal(false)
     };
 
 
@@ -256,9 +258,13 @@ const mapStateToProps = state => {
     };
 };
 
+const mapDispatchToProps = dispatch => {
+    return {
+        loadingGlobal : data => dispatch(loadingGlobal(data)),
+    };
+  }
 
-
-const SystemSetting = connect(mapStateToProps)(SystemSettingComponent);
+const SystemSetting = connect(mapStateToProps,mapDispatchToProps)(SystemSettingComponent);
 
 export default withStyles(styles)(SystemSetting);
 

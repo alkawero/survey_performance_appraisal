@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { doGet,doDownloadExcel } from "../services/api-service";
+import { doGet,doDownloadExcel,doDelete } from "../services/api-service";
 import { connect } from "react-redux";
 import history from "../history.js";
 import {getDataDoAssessment,getAssessmentDetail}  from '../actions';
@@ -29,6 +29,9 @@ import ActionButton from "../components/ActionButton";
 import AddIcon from "@material-ui/icons/Add";
 import TableFooter  from '@material-ui/core/TableFooter';
 import TablePagination   from '@material-ui/core/TablePagination';
+import ClickAwayListener from '@material-ui/core/ClickAwayListener';
+import Delete from "@material-ui/icons/Delete";
+import DeleteForever from "@material-ui/icons/DeleteForever";
 
 const PaAssessmentComponent = props => {
     const { classes } = props;
@@ -47,6 +50,7 @@ const PaAssessmentComponent = props => {
     const [page, setPage] = useState(1)
     const [totalRows, setTotalRows] = useState(0)
     const [filterParams, setFilterParams] = useState({})
+    const [tobeDelete, setTobeDelete] = useState(0)
 
     const changePage=(event, newPage)=>{
         setPage(newPage+1)
@@ -170,6 +174,17 @@ const PaAssessmentComponent = props => {
             unit_id : selectedUnitParticipant!==null ? selectedUnitParticipant.value : null
         };
         doDownloadExcel("pa/assessment/export/excel",params)
+    }
+
+    const confirmDelete = (data_id)=>{
+        setTobeDelete(data_id)
+    }
+
+    const deleteData = async(data_id)=>{
+        const params={id:data_id}
+        await doDelete('pa/assessment',params)
+        setTobeDelete(0)
+        getData(page,filterParams)
     }
 
 
@@ -332,7 +347,8 @@ const PaAssessmentComponent = props => {
                                                 <TableCell align="center">
                                                     {row.score_category}
                                                 </TableCell>
-                                                <TableCell align="center">
+                                                <TableCell align="left">
+                                                    <Grid container wrap="nowrap" alignItems="center">
                                                     <ActionButton
                                                         title="detail"
                                                         type="icon-button"
@@ -342,6 +358,33 @@ const PaAssessmentComponent = props => {
                                                         disabled={row.status === 0 || row.is_custom===0}
                                                         icon={<Visibility fontSize="small" />}
                                                     />
+
+                                                    {tobeDelete!==row.id &&
+                                                        <ActionButton
+                                                            title="delete"
+                                                            type='icon-button'
+                                                            for={['adm']}
+                                                            role={props.user.role}
+                                                            action={()=>confirmDelete(row.id)}
+                                                            icon={<Delete />}
+                                                    />
+                                                    }
+                                                    {tobeDelete===row.id &&
+                                                        <>
+                                                        <span style={{whiteSpace: 'nowrap'}}>are you sure ?</span>
+                                                        <ClickAwayListener onClickAway={()=>setTobeDelete(0)}>
+                                                                <ActionButton
+                                                                    title="click again to delete"
+                                                                    type='icon-button'
+                                                                    for={['adm']}
+                                                                    role={props.user.role}
+                                                                    action={()=>deleteData(row.id)}
+                                                                    icon={<DeleteForever />}
+                                                                />
+                                                        </ClickAwayListener>
+                                                        </>
+                                                    }
+                                                    </Grid>
                                                 </TableCell>
                                             </TableRow>
                                         ))}
@@ -378,34 +421,7 @@ const PaAssessmentComponent = props => {
                 </Grid>
             </Grid>
 
-            <Dialog
-                open={false}
-                onClose={() => {}}
-                aria-labelledby="alert-dialog-title"
-                aria-describedby="alert-dialog-description"
-            >
-                <DialogTitle id="alert-dialog-title">
-                    {"Delete confirmation ?"}
-                </DialogTitle>
-                <DialogContent>
-                    <DialogContentText id="alert-dialog-description">
-                        Apakah anda yakin akan menghapus data tersebut ?
-                    </DialogContentText>
-                </DialogContent>
-                <DialogActions>
-                    <Button onClick={() => {}} color="secondary">
-                        Delete
-                    </Button>
-                    <Button
-                        onClick={() => {}}
-                        color="primary"
-                        variant="contained"
-                        autoFocus
-                    >
-                        Cancel
-                    </Button>
-                </DialogActions>
-            </Dialog>
+
         </React.Fragment>
     );
 };

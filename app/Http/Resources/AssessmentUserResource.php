@@ -4,6 +4,7 @@ namespace App\Http\Resources;
 
 use Illuminate\Http\Resources\Json\JsonResource;
 use App\PaAssessmentUser;
+use App\Setting;
 use \Datetime;
 
 class AssessmentUserResource extends JsonResource
@@ -16,6 +17,9 @@ class AssessmentUserResource extends JsonResource
      */
     public function toArray($request)
     {
+        $PaStartDate = Setting::where('indicator', 'appraisal_start_date')->value('value');
+        $PaEndDate = Setting::where('indicator', 'appraisal_end_date')->value('value');
+
         $assessment = $this->assessment()->first();
         $master = $assessment->master()->first();
         $participant = $this->participant()->first();
@@ -26,10 +30,10 @@ class AssessmentUserResource extends JsonResource
         $today_midnite = new DateTime('midnight');
         $today = new DateTime();
 
-        if($today_midnite > new DateTime($master->valid_until)) {
+        if($today_midnite > DateTime::createFromFormat('Y-m-d', $PaEndDate)) {
             $expired = true;
         }
-        if ($today > new DateTime($master->valid_from)) {
+        if ($today > DateTime::createFromFormat('Y-m-d', $PaStartDate)) {
             $started = true;
         }
 
@@ -59,8 +63,8 @@ class AssessmentUserResource extends JsonResource
             'owner_name'=>$participant->emp_name,
             'atasan_id'=>$this->atasan_id,
             'master_name'=>$master->name,
-            'valid_from'=>$master->valid_from,
-            'valid_until'=>$master->valid_until,
+            'valid_from'=>$PaEndDate,
+            'valid_until'=>$PaStartDate,
             'total_score'=>number_format($total_score,2),
             'score_category'=>$this->getCategory($total_score),
             'status_code'=>$assessment->status,

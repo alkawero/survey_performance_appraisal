@@ -377,6 +377,7 @@ class SurveyImplementationComponent extends Component {
                                 icon={<InputIcon fontSize='small'/>}/>}
 
                             <ActionButton
+                                title="edit"
                                 type='icon-button'
                                 for={['adm']}
                                 role={this.props.user.role}

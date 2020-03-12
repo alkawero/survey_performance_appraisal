@@ -248,6 +248,7 @@ const PaUnsurComponent = (props) => {
                                                 </TableCell>
                                                 <TableCell align="left" style={{width:250}}>
                                                     <ActionButton
+                                                        title="edit"
                                                         type='icon-button'
                                                         for={['adm']}
                                                         role={props.user.role}
@@ -256,6 +257,7 @@ const PaUnsurComponent = (props) => {
 
                                                     {tobeDelete!==row.id &&
                                                             <ActionButton
+                                                                    title="delete"
                                                                     type='icon-button'
                                                                     for={['adm']}
                                                                     role={props.user.role}
@@ -267,7 +269,6 @@ const PaUnsurComponent = (props) => {
                                                             <>are you sure ?
                                                             <ClickAwayListener onClickAway={()=>setTobeDelete(0)}>
                                                                     <ActionButton
-                                                                        tooltip={true}
                                                                         title="click again to delete"
                                                                         type='icon-button'
                                                                         for={['adm']}
@@ -320,37 +321,7 @@ const PaUnsurComponent = (props) => {
                 </Grid>
             </Grid>
 
-            <Dialog
-                open={false}
-                onClose={() => {}}
-                aria-labelledby="alert-dialog-title"
-                aria-describedby="alert-dialog-description"
-            >
-                <DialogTitle id="alert-dialog-title">
-                    {"Delete confirmation ?"}
-                </DialogTitle>
-                <DialogContent>
-                    <DialogContentText id="alert-dialog-description">
-                        Apakah anda yakin akan menghapus data tersebut ?
-                    </DialogContentText>
-                </DialogContent>
-                <DialogActions>
-                    <Button
-                        onClick={() => {}}
-                        color="secondary"
-                    >
-                        Delete
-                    </Button>
-                    <Button
-                        onClick={() => {}}
-                        color="primary"
-                        variant="contained"
-                        autoFocus
-                    >
-                        Cancel
-                    </Button>
-                </DialogActions>
-            </Dialog>
+
         </React.Fragment>
     );
 

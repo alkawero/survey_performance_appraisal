@@ -86,7 +86,7 @@ const PaAssessmentCreateComponent = (props) =>{
         const params={}
         const response = await doGet('pa/master',params)
         if(response.data.length>0){
-            const dataForSelect = response.data.map(master=>({value:master.id, label:`${master.name} - semester ${master.semester} - periode ${master.periode}`}))
+            const dataForSelect = response.data.map(master=>({value:master.id, label:master.name}))
             setMasterOptions(dataForSelect)
         }
 

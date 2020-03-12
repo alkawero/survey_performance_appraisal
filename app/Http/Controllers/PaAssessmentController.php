@@ -401,4 +401,11 @@ class PaAssessmentController extends Controller
         return $periodes;
     }
 
+    public function deleteById(Request $request){
+
+        DB::table('assessment_unsur_scores')->where('assessment_users_id', $request->id)->delete();
+        DB::table('sub_aspek_scores')->where('assessment_users_id', $request->id)->delete();
+        DB::table('assessments_users')->where('id', $request->id)->delete();
+    }
+
 }
