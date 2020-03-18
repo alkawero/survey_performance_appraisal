@@ -305,6 +305,9 @@ const PaAssessmentComponent = props => {
                                             Assessment
                                         </TableCell>
                                         <TableCell align="center">
+                                            Periode
+                                        </TableCell>
+                                        <TableCell align="center">
                                             Valid From
                                         </TableCell>
                                         <TableCell align="center">
@@ -331,6 +334,9 @@ const PaAssessmentComponent = props => {
                                                 </TableCell>
                                                 <TableCell align="center">
                                                     {row.master_name}
+                                                </TableCell>
+                                                <TableCell align="center">
+                                                    {row.periode}
                                                 </TableCell>
                                                 <TableCell align="center">
                                                     {row.valid_from}

@@ -484,6 +484,14 @@ class SurveyController extends Controller
         return $periodes;
     }
 
+    public function getCurrentSurveyForSelect(Request $request)
+    {
+        $periode = Setting::where('indicator','periode_active')->value('value');
+        $surveyIds = SurveyTrx::where('periode',$periode)->groupBy('survey_id')->pluck('survey_id');
+        $survey = Survey::select('id','judul')->whereIn('id',$surveyIds)->get();
+        return $survey;
+    }
+
 
 
 }

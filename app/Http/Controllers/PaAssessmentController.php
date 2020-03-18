@@ -31,7 +31,8 @@ class PaAssessmentController extends Controller
 
         if($request->user_id){
             $assessmentUsers = PaAssessmentUser::where("participant_id",$request->user_id)
-                        ->orWhere("atasan_id",$request->user_id);
+                        ->orWhere("atasan_id",$request->user_id)
+                        ->orderBy('id', 'desc');
         }
 
         if($request->rowsPerPage)
@@ -117,9 +118,9 @@ class PaAssessmentController extends Controller
 
 
         if($request->rowsPerPage)
-        return $assessmentUsers->paginate($request->rowsPerPage);
+        return $assessmentUsers->orderBy('id','desc')->paginate($request->rowsPerPage);
         else
-        return $assessmentUsers->get();
+        return $assessmentUsers->orderBy('id','desc')->get();
     }
 
     public function getDataDoAssessments(Request $request){

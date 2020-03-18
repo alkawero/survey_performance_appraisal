@@ -238,6 +238,14 @@ const PaDoAssessmentComponent = props => {
                     </Grid>
 
                     <Grid item xs={12} container direction="column">
+                        <Grid container className={classes.table_header}>
+                            <Grid item xs={7} container justify="center">Indicator</Grid>
+                            <Grid item xs={2} container justify="flex-end">weight</Grid>
+                            <Grid item xs={1} container justify="center"></Grid>
+                            <Grid item xs={1} container justify="flex-end"></Grid>
+                            <Grid item xs={1} container justify="flex-end">Total Score</Grid>
+                        </Grid>
+
                         <Grid container>
                                 {aspekScores.map(aspek => (
                                     <Grid key={aspek.id} container className={classes.aspek_container}>
@@ -271,8 +279,9 @@ const PaDoAssessmentComponent = props => {
                                                                     <Grid item xs={1}>{unsur.code}</Grid>
                                                                     <Grid item xs={7}>
                                                                         {unsur.name}
-                                                                        </Grid>
-                                                                    <Grid item container xs={4} justify="space-evenly">
+                                                                    </Grid>
+                                                                    <Grid item xs={1}>{unsur.bobot}%</Grid>
+                                                                    <Grid item container xs={3} justify="space-evenly">
                                                                     {
                                                                     props.assessment.atasan_id==props.user.emp_id &&
                                                                         <Grid item container spacing={8} justify="flex-end" alignItems="center" className={classes.unsur_score} >
@@ -446,6 +455,11 @@ const styles = theme => ({
     container: {
         marginTop: -16,
         marginLeft: 5
+    },
+    table_header:{
+        backgroundColor:'#ffdb76',
+        padding :10,
+
     },
     marginTops: {
         marginTop: 10

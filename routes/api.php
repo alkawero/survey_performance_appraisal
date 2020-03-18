@@ -31,6 +31,7 @@ Route::get('survey', 'SurveyController@getByParams');
 Route::post('survey', 'SurveyController@storeSurvey');
 Route::patch('survey', 'SurveyController@updateSurvey');
 Route::get('survey/select/', 'SurveyController@getSurveyForSelect');
+Route::get('survey/select/current', 'SurveyController@getCurrentSurveyForSelect');
 Route::get('survey/trx/periode', 'SurveyController@getSurveyTransactionPeriode');
 Route::get('survey/{id}/', 'SurveyController@getSurvey');
 Route::get('survey/{id}/emp/', 'SurveyController@getEmpOwnerSurvey');
@@ -99,6 +100,7 @@ Route::patch('pa/external', 'PaExternalDataController@update');
 Route::post('pa/external', 'PaExternalDataController@store');
 Route::get('pa/external', 'PaExternalDataController@getByParams');
 Route::get('pa/external/group', 'PaExternalDataController@getGroups');
+Route::get('pa/external/group/current', 'PaExternalDataController@getCurrentGroups');
 Route::get('pa/external/periode', 'PaExternalDataController@getPeriode');
 Route::delete('pa/external', 'PaExternalDataController@deleteById');
 

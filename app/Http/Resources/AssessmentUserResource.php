@@ -63,6 +63,7 @@ class AssessmentUserResource extends JsonResource
             'owner_name'=>$participant->emp_name,
             'atasan_id'=>$this->atasan_id,
             'master_name'=>$master->name,
+            'periode'=>$assessment->periode,
             'valid_from'=>$PaEndDate,
             'valid_until'=>$PaStartDate,
             'total_score'=>number_format($total_score,2),

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use \App\PaExternalData;
 use App\Http\Resources\ExternalDataResource;
+use App\Setting;
 use Illuminate\Support\Facades\DB;
 
 class PaExternalDataController extends Controller
@@ -51,6 +52,11 @@ class PaExternalDataController extends Controller
 
     public function getGroups(){
         return PaExternalData::groupBy('group')->pluck('group');
+    }
+
+    public function getCurrentGroups(){
+        $periode = Setting::where('indicator','periode_active')->value('value');
+        return PaExternalData::where('periode',$periode)->groupBy('group')->pluck('group');
     }
 
     public function getPeriode(){

@@ -3,6 +3,7 @@ import { doGet, doPost,doPut } from "../services/api-service";
 import {setAspekEdit} from '../actions'
 import { connect } from "react-redux";
 import { withStyles } from "@material-ui/core/styles";
+import Popover from '@material-ui/core/Popover';
 import Grid from "@material-ui/core/Grid";
 import Button from "@material-ui/core/Button";
 import TextField from "@material-ui/core/TextField";
@@ -31,7 +32,8 @@ import NativeSelect from '@material-ui/core/NativeSelect';
 
 const PaAspekCreateComponent = props => {
     const [anchorEl, setAnchorEl] = React.useState(null);
-    const [openChildMenu, setOpenChildMenu] = React.useState(false);
+    const [openChildExt, setOpenChildExt] = React.useState(false);
+    const [openChildSurvey, setOpenChildSurvey] = React.useState(false);
     const [groupOptions, setGroupOptions] = useState([])
     const [status, setStatus] = useState(true);
     const [code, setCode] = useState("");
@@ -71,7 +73,7 @@ const PaAspekCreateComponent = props => {
 
     const getDataSurvey = async() => {
         const params={}
-        const response = await doGet('survey/select/',params)
+        const response = await doGet('survey/select/current',params)
         if(response.data.length>0){
             const dataForSelect = response.data.map(survey=>({value:survey.id, label:survey.judul}))
             setSurveyOptions(dataForSelect)
@@ -91,7 +93,7 @@ const PaAspekCreateComponent = props => {
 
     const getDataGroup = async () =>{
         const params={}
-        const response = await doGet('pa/external/group',params)
+        const response = await doGet('pa/external/group/current',params)
         if(response.data.length>0){
             const dataForSelect = response.data.map(group=>({value:group, label:group}))
             setGroupOptions(dataForSelect)
@@ -779,40 +781,58 @@ const PaAspekCreateComponent = props => {
                 </Grid>
             </Grid>
 
-            <Menu
-                id="ex-data-menu"
-                anchorEl={anchorEl}
-                keepMounted
+            <Popover
                 open={Boolean(anchorEl)}
+                anchorEl={anchorEl}
                 onClose={toggleExternalDataMenu}
+                anchorOrigin={{
+                vertical: 'center',
+                horizontal: 'left',
+                }}
+                transformOrigin={{
+                vertical: 'center',
+                horizontal: 'right',
+                }}
             >
+                <Grid container style={{width:500, height:500, overflow:'scroll'}}>
+                    <Grid item xs={12}><MenuItem onClick={()=>setExternalData("optional")}>Optional</MenuItem></Grid>
+                    <Grid item xs={12}><MenuItem onClick={()=>setExternalData("mandatory")}>Mandatory</MenuItem></Grid>
+                    <Grid item xs={12}><MenuItem onClick={()=>setExternalData(null)}>No External Data</MenuItem></Grid>
+                    <Grid item xs={12}><MenuItem onClick={()=>setExternalData("hris_ijin")}>Data HRIS Ijin</MenuItem></Grid>
+                    <Grid item xs={12}><MenuItem onClick={()=>setExternalData("hris_absen")}>Data HRIS Absen</MenuItem></Grid>
+                    <Grid item xs={12}>
+                        <MenuItem onClick={()=>setOpenChildExt(!openChildExt)}>
+                            Data Input by HRD
+                            {openChildExt ? <ExpandLess /> : <ExpandMore />}
+                        </MenuItem>
+                    </Grid>
+                    <Grid item xs={12}>
+                        <Collapse in={openChildExt} timeout="auto" unmountOnExit>
+                            {groupOptions.map(group=>(
+                                <MenuItem onClick={()=>setExternalData(group.value)}>{group.value}</MenuItem>
+                            ))
+                            }
+                        </Collapse>
+                    </Grid>
+                    <Grid item xs={12}>
+                        <MenuItem onClick={()=>setOpenChildSurvey(!openChildSurvey)}>
+                            Data Survey
+                            {openChildSurvey ? <ExpandLess /> : <ExpandMore />}
+                        </MenuItem>
+                    </Grid>
+                    <Grid item xs={12}>
+                        <Collapse in={openChildSurvey} timeout="auto" unmountOnExit>
+                            {surveyOptions.map(survey=>(
+                                <MenuItem onClick={()=>setExternalData('survey-'+survey.value)}>{survey.label}</MenuItem>
+                            ))
+                            }
+                        </Collapse>
+                    </Grid>
 
-                <MenuItem onClick={()=>setExternalData("optional")}>Optional</MenuItem>
-                <MenuItem onClick={()=>setExternalData("mandatory")}>Mandatory</MenuItem>
-                <MenuItem onClick={()=>setExternalData(null)}>No External Data</MenuItem>
-                <MenuItem onClick={()=>setExternalData("hris_ijin")}>Data HRIS Ijin</MenuItem>
-                <MenuItem onClick={()=>setExternalData("hris_absen")}>Data HRIS Absen</MenuItem>
-                <MenuItem onClick={()=>setOpenChildMenu(!openChildMenu)}>
-                    Data Input by HRD
-                    {openChildMenu ? <ExpandLess /> : <ExpandMore />}
-                </MenuItem>
-                <Collapse in={openChildMenu} timeout="auto" unmountOnExit>
-                    {groupOptions.map(group=>(
-                        <MenuItem onClick={()=>setExternalData(group.value)}>{group.value}</MenuItem>
-                    ))
-                    }
-                </Collapse>
-                <MenuItem onClick={()=>setOpenChildMenu(!openChildMenu)}>
-                    Data Survey
-                    {openChildMenu ? <ExpandLess /> : <ExpandMore />}
-                </MenuItem>
-                <Collapse in={openChildMenu} timeout="auto" unmountOnExit>
-                    {surveyOptions.map(survey=>(
-                        <MenuItem onClick={()=>setExternalData('survey-'+survey.value)}>{survey.label}</MenuItem>
-                    ))
-                    }
-                </Collapse>
-            </Menu>
+                </Grid>
+
+            </Popover>
+
         </Grid>
     );
 };
