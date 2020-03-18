@@ -25,11 +25,11 @@ class SurveyTasksResource extends JsonResource
 
         if($today_midnite > new DateTime($trx->valid_until)) {
             $expired = true;
-        }  
+        }
         if ($today > new DateTime($trx->valid_from)) {
             $started = true;
-        } 
-        
+        }
+
         return [
             'id' => $this->id,
             'judul'=>$survey->judul,
@@ -42,6 +42,7 @@ class SurveyTasksResource extends JsonResource
             'survey_trx_id'=>$trx->id,
             'expired'=>$expired,
             'started'=>$started,
+            'periode'=>$trx->periode,
         ];
 
     }

@@ -479,5 +479,11 @@ class SurveyController extends Controller
     }
 
 
+    public function getSurveyTransactionPeriode(Request $request){
+        $periodes = SurveyTrx::groupBy('periode')->pluck('periode');
+        return $periodes;
+    }
+
+
 
 }

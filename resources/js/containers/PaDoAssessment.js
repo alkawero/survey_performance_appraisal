@@ -31,7 +31,10 @@ const PaDoAssessmentComponent = props => {
             const unsurScoreTemp = props.assessment.unsurs.map(unsur=>({...unsur, unsur_id:unsur.id,sub_aspek_id:unsur.sub_aspek_id}))
             const aspekScoreTemp = props.assessment.aspeks.map(aspek=>({...aspek, aspek_id:aspek.id}))
             const subAspekScoreTemp = props.assessment.sub_aspeks.map(subAspek=>({...subAspek, sub_aspek_id:subAspek.id, aspek_id:subAspek.aspek_id}))
-            setUnsurScores(unsurScoreTemp)
+
+            const sortedUnsur = unsurScoreTemp.sort((a, b) => (a.id > b.id) ? 1 : -1)
+
+            setUnsurScores(sortedUnsur)
             setAspekScores(aspekScoreTemp)
             setSubAspekScores(subAspekScoreTemp)
             setGrandTotal(props.assessment.total_score)
@@ -51,19 +54,29 @@ const PaDoAssessmentComponent = props => {
 
     const atasanUnsurChange = (unsur_id,e) => {
 
+        let newUnsurScores;
         const oldUnsurScore = unsurScores.find(u=>u.unsur_id === unsur_id)
         if(oldUnsurScore.external_data){
             return
         }
-        const otherOldUnsurScore = unsurScores.filter(u=>u.unsur_id !== unsur_id)
-
 
         let scoreValue = parseInt(e.target.value);
         if(scoreValue>maxScore){
             scoreValue = maxScore
         }
-        const newScore = {...oldUnsurScore, atasan_score:scoreValue, atasanPercentScore:(scoreValue*oldUnsurScore.bobot/100)}
-        const newUnsurScores = [...otherOldUnsurScore, newScore]
+        if(oldUnsurScore.is_optional===1 && scoreValue===0){
+            const newScore = {...oldUnsurScore, atasan_score:0, atasanPercentScore:0}
+
+            const oldUnsurReceiver = unsurScores.find(u=>u.code === oldUnsurScore.receiver_unsur_code)
+
+            const newUnsurReceiver = {...oldUnsurReceiver, atasanPercentScore:(oldUnsurReceiver.atasan_score*((oldUnsurReceiver.bobot+oldUnsurScore.bobot)/100))}
+            const otherOldUnsurScore = unsurScores.filter(u=>(u.id !== unsur_id && u.id !== oldUnsurReceiver.id))
+            newUnsurScores = [...otherOldUnsurScore, newScore,newUnsurReceiver]
+        }else{
+            const newScore = {...oldUnsurScore, atasan_score:scoreValue, atasanPercentScore:(scoreValue*oldUnsurScore.bobot/100)}
+            const otherOldUnsurScore = unsurScores.filter(u=>u.unsur_id !== unsur_id)
+            newUnsurScores = [...otherOldUnsurScore, newScore]
+        }
         const sorted = newUnsurScores.sort((a, b) => (a.id> b.id ) ? 1 : -1)
         setUnsurScores(sorted)
 
@@ -71,49 +84,42 @@ const PaDoAssessmentComponent = props => {
 
     const staffUnsurChange = (unsur_id,e) => {
 
+        let newUnsurScores;
         const oldUnsurScore = unsurScores.find(u=>u.unsur_id === unsur_id)
         if(oldUnsurScore.external_data){
             return
         }
-        const otherOldUnsurScore = unsurScores.filter(u=>u.unsur_id !== unsur_id)
 
         let scoreValue = parseInt(e.target.value);
         if(scoreValue>maxScore){
             scoreValue = maxScore
         }
-        const newScore = {...oldUnsurScore, staff_score:scoreValue, staffPercentScore:(scoreValue*oldUnsurScore.bobot/100)}
-        const newUnsurScores = [...otherOldUnsurScore, newScore]
+        if(oldUnsurScore.is_optional===1 && scoreValue===0){
+            const newScore = {...oldUnsurScore, staff_score:0, staffPercentScore:0}
+
+            const oldUnsurReceiver = unsurScores.find(u=>u.code === oldUnsurScore.receiver_unsur_code)
+
+            const newUnsurReceiver = {...oldUnsurReceiver, staffPercentScore:(oldUnsurReceiver.staff_score*((oldUnsurReceiver.bobot+oldUnsurScore.bobot)/100))}
+            const otherOldUnsurScore = unsurScores.filter(u=>(u.id !== unsur_id && u.id !== oldUnsurReceiver.id))
+            newUnsurScores = [...otherOldUnsurScore, newScore,newUnsurReceiver]
+        }else{
+            const newScore = {...oldUnsurScore, staff_score:scoreValue, staffPercentScore:(scoreValue*oldUnsurScore.bobot/100)}
+            const otherOldUnsurScore = unsurScores.filter(u=>u.unsur_id !== unsur_id)
+            newUnsurScores = [...otherOldUnsurScore, newScore]
+        }
+
         const sorted = newUnsurScores.sort((a, b) => (a.id > b.id) ? 1 : -1)
         setUnsurScores(sorted)
-
     };
 
 
     useEffect(() => {
 
         const newSubAspekScores = subAspekScores.map(sub=>{
-            let newScoreFromAtasan, newScoreFromStaff;
-
             const filteredUnsurScores = unsurScores.filter(unsur=>(unsur.sub_aspek_id===sub.sub_aspek_id))
-            const totalBobotSubAspek = filteredUnsurScores.reduce((acc,current)=>acc+current.bobot,0)
-            const optionalZeroAtasan = filteredUnsurScores.filter(unsur=>(unsur.is_optional===1 && unsur.atasan_score===0))
-            const optionalZeroStaff = filteredUnsurScores.filter(unsur=>(unsur.is_optional===1 && unsur.staff_score===0))
 
-            if(optionalZeroAtasan.length>0){
-                const totalScoreAtasan = filteredUnsurScores.reduce((acc,current)=>acc+current.atasan_score,0)
-                newScoreFromAtasan = totalScoreAtasan / (filteredUnsurScores.length - optionalZeroAtasan.length) * totalBobotSubAspek/100
-            }else{
-                newScoreFromAtasan = filteredUnsurScores.reduce((acc,current)=>acc + current.atasanPercentScore,0)
-            }
-
-
-            if(optionalZeroStaff.length>0){
-                const totalScoreStaff = filteredUnsurScores.reduce((acc,current)=>acc+current.staff_score,0)
-                newScoreFromStaff = totalScoreStaff / (filteredUnsurScores.length - optionalZeroStaff.length) * totalBobotSubAspek/100
-            }else{
-                newScoreFromStaff = filteredUnsurScores.reduce((acc,current)=>acc + current.staffPercentScore,0)
-            }
-
+            const newScoreFromAtasan = filteredUnsurScores.reduce((acc,current)=>acc + current.atasanPercentScore,0)
+            const newScoreFromStaff = filteredUnsurScores.reduce((acc,current)=>acc + current.staffPercentScore,0)
 
             return {...sub, score:(
                 (newScoreFromAtasan * props.assessment.bobot_atasan/100)
@@ -122,6 +128,7 @@ const PaDoAssessmentComponent = props => {
         })
 
         setSubAspekScores(newSubAspekScores)
+        console.log(unsurScores)
     }, [unsurScores])
 
 
@@ -233,7 +240,7 @@ const PaDoAssessmentComponent = props => {
                     <Grid item xs={12} container direction="column">
                         <Grid container>
                                 {aspekScores.map(aspek => (
-                                    <Grid container className={classes.aspek_container}>
+                                    <Grid key={aspek.id} container className={classes.aspek_container}>
                                         <Grid container className={classes.aspek_row}>
                                             <Grid item xs={1}>{aspek.code}</Grid>
                                             <Grid item xs={5}>{aspek.name}</Grid>
@@ -246,7 +253,7 @@ const PaDoAssessmentComponent = props => {
                                         {subAspekScores
                                             .filter(a => a.aspek_id === aspek.id)
                                             .map(sub_aspek => (
-                                                <Grid container className={classes.sub_aspek}>
+                                                <Grid key={sub_aspek.id} container className={classes.sub_aspek}>
                                                     <Grid container className={classes.sub_aspek_row}>
                                                         <Grid item xs={1}>{sub_aspek.code}</Grid>
                                                         <Grid item xs={5}>{sub_aspek.name}</Grid>
@@ -259,7 +266,7 @@ const PaDoAssessmentComponent = props => {
                                                     {unsurScores
                                                         .filter(u =>u.sub_aspek_id === sub_aspek.id)
                                                         .map(unsur => (
-                                                            <Grid container className={classes.unsur}>
+                                                            <Grid key={unsur.id} container className={classes.unsur}>
                                                                 <Grid container className={classes.unsur_row}>
                                                                     <Grid item xs={1}>{unsur.code}</Grid>
                                                                     <Grid item xs={7}>

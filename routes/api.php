@@ -31,6 +31,7 @@ Route::get('survey', 'SurveyController@getByParams');
 Route::post('survey', 'SurveyController@storeSurvey');
 Route::patch('survey', 'SurveyController@updateSurvey');
 Route::get('survey/select/', 'SurveyController@getSurveyForSelect');
+Route::get('survey/trx/periode', 'SurveyController@getSurveyTransactionPeriode');
 Route::get('survey/{id}/', 'SurveyController@getSurvey');
 Route::get('survey/{id}/emp/', 'SurveyController@getEmpOwnerSurvey');
 Route::get('survey/{id}/unit/', 'SurveyController@getUnitOwnerSurvey');

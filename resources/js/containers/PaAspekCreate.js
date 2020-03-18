@@ -25,6 +25,7 @@ import Collapse from '@material-ui/core/Collapse';
 import ExpandLess from '@material-ui/icons/ExpandLess';
 import ExpandMore from '@material-ui/icons/ExpandMore';
 import Widgets from '@material-ui/icons/Widgets';
+import NativeSelect from '@material-ui/core/NativeSelect';
 
 
 
@@ -172,6 +173,7 @@ const PaAspekCreateComponent = props => {
             showCategory:false,
             external_data:null,
             is_optional:false,
+            receiver_unsur_code:"",
             category_1_label:"",
             category_2_label:"",
             category_3_label:"",
@@ -234,6 +236,15 @@ const PaAspekCreateComponent = props => {
     const unsurNameChange = (value,unsur_code) => {
         let newUnsur = unsurs.filter(unsur=>unsur.unsur_code === unsur_code)[0]
         newUnsur = {...newUnsur, unsur_name: value}
+
+        const otherUnsurs = unsurs.filter(unsur=>unsur.unsur_code !== unsur_code)
+        const sorted = [...otherUnsurs, newUnsur].sort((a, b) => (a.order > b.order) ? 1 : -1)
+        setUnsurs(sorted)
+    };
+
+    const handleSelectBobotReceiver = (unsur_code,event) => {
+        let newUnsur = unsurs.find(unsur=>unsur.unsur_code === unsur_code)
+        newUnsur = {...newUnsur, receiver_unsur_code: event.target.value}
 
         const otherUnsurs = unsurs.filter(unsur=>unsur.unsur_code !== unsur_code)
         const sorted = [...otherUnsurs, newUnsur].sort((a, b) => (a.order > b.order) ? 1 : -1)
@@ -374,6 +385,10 @@ const PaAspekCreateComponent = props => {
                     </Tooltip>)
     }
 
+    const getUnsurInSubAspek= (sub_aspek_code) => {
+        return unsurs.filter(u=>u.sub_aspek_code===sub_aspek_code)
+    }
+
 
     const title = props.aspek_to_edit ? "Edit Aspek" : "Create New Aspek"
     return (
@@ -501,7 +516,7 @@ const PaAspekCreateComponent = props => {
                                     </Grid>
                                     <Grid container className={classes.unsur_container}>
                                     {
-                                        unsurs.filter(u=>u.sub_aspek_code===sub.sub_aspek_code).map(unsur=>(
+                                        getUnsurInSubAspek(sub.sub_aspek_code).map(unsur=>(
                                             <Grid item xs={12} container spacing={8} className={classes.unsur_row}>
                                                 <Grid item xs={2}>
                                                     <TextField
@@ -515,7 +530,7 @@ const PaAspekCreateComponent = props => {
                                                     />
 
                                                 </Grid>
-                                                <Grid item xs={7}>
+                                                <Grid item xs={6}>
                                                     <DebouncedTextField
                                                         id="Unsur Name"
                                                         label="Unsur Name"
@@ -530,7 +545,7 @@ const PaAspekCreateComponent = props => {
 
                                                 </Grid>
 
-                                                <Grid item xs={3} container alignItems="center">
+                                                <Grid item xs={4} container alignItems="center">
                                                     <Tooltip title="Delete Unsur">
                                                         <IconButton size="small" aria-label="delete" onClick={()=>deleteUnsur(unsur.unsur_code,unsur.sub_aspek_code)}>
                                                             <Delete fontSize="small"/>
@@ -552,9 +567,35 @@ const PaAspekCreateComponent = props => {
                                                         </IconButton>
                                                     </Tooltip>
                                                     }
+
                                                     {
-                                                        unsur.is_optional && <Typography type="body2" onClick={(event)=>toggleExternalDataMenu(unsur.unsur_code,event)} className={classes.pointer}>optional</Typography>
+
+                                                        unsur.is_optional &&
+                                                        <>
+                                                        <Typography type="body2" onClick={(event)=>toggleExternalDataMenu(unsur.unsur_code,event)} className={classes.pointer}>optional</Typography>
+
+                                                        <NativeSelect
+                                                        value={unsur.receiver_unsur_code}
+                                                        onChange={()=>handleSelectBobotReceiver(unsur.unsur_code,event)}
+                                                        inputProps={{
+                                                            name: 'age',
+                                                            id: 'age-native-helper',
+                                                        }}
+                                                        style={{marginLeft: 8}}
+                                                        >
+                                                        <option value="">bobot receiver</option>
+                                                        {
+                                                            getUnsurInSubAspek(sub.sub_aspek_code)
+                                                            .filter(unsr=>unsr.unsur_code!==unsur.unsur_code)
+                                                            .map(fltUnsur=>(
+                                                            <option value={fltUnsur.unsur_code}>{fltUnsur.unsur_code}</option>
+                                                            ))
+                                                        }
+
+                                                        </NativeSelect>
+                                                        </>
                                                     }
+
 
                                                 </Grid>
                                                 {   unsur.showCategory &&
@@ -831,7 +872,8 @@ const styles = theme => ({
         flex:1
     },
     pointer:{
-        cursor: 'pointer'
+        cursor: 'pointer',
+        color: 'red'
     }
 });
 

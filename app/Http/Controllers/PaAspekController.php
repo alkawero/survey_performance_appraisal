@@ -77,6 +77,8 @@ class PaAspekController extends Controller
                         $unsur->sub_aspek_id = $subAspek->id;
                         $unsur->name = $uns['unsur_name'];
                         $unsur->code = $uns['unsur_code'];
+                        $unsur->is_optional = $uns['is_optional']?1:0;
+                        $unsur->receiver_unsur_code = $uns['receiver_unsur_code'];
                         $unsur->external_data = $uns['external_data'];
                         $unsur->category_1_label = $uns['category_1_label'];
                         $unsur->category_2_label = $uns['category_2_label'];

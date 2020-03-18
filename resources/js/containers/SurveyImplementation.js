@@ -1,5 +1,6 @@
 import React,{Component} from 'react';
 import { connect } from "react-redux";
+import { doGet } from "../services/api-service";
 import {setLastPage,setImplPage,setImplRowPerPage,getSurveySelect, clearSurveyTask,toggleActiveSurveyImpl,getCrntSrvImpl,toggleSnackBar,getsurveyTasks,getsurveyTaskDetail}  from '../actions';
 import Typography from '@material-ui/core/Typography';
 import { withStyles } from '@material-ui/core/styles';
@@ -114,7 +115,9 @@ class SurveyImplementationComponent extends Component {
             filterSurvey:null,
             filterOwnerName:'',
             filterTask:{value:'all_task',label:'All Survey Task'},
-            firstTime:true
+            firstTime:true,
+            periodeOptions:[],
+            filterPeriode:null
         }
 
     }
@@ -123,6 +126,7 @@ class SurveyImplementationComponent extends Component {
         this.setState({firstTime:false})
         this.refresh(this.props.page,this.props.rowsPerPage)
         this.props.getSurveySelect()
+        this.getPeriodeOptions()
 
     }
 
@@ -130,6 +134,18 @@ class SurveyImplementationComponent extends Component {
         this.props.clearSurveyTask()
 
         this.props.setLastPage('implementation')
+    }
+
+    getPeriodeOptions = async() =>{
+        const response = await doGet('survey/trx/periode',{});
+        if(response){
+            const periodeOpt= response.data.map(data=>({label:data, value:data}))
+            this.setState({periodeOptions:periodeOpt})
+        }
+    }
+
+    filterPeriodeChange = (e) =>{
+        this.setState({filterPeriode:e})
     }
 
     filterSurveyChange = (e) =>{
@@ -213,17 +229,6 @@ class SurveyImplementationComponent extends Component {
     handleChangePage=(e,newPage)=>{
 
         console.log(this.props.page+' - '+newPage)
-        /*
-        if(this.props.lastPage!=='implementation_edit' && this.props.lastPage!=='implementation_answer'){
-            this.props.setImplPage(newPage)
-            this.refresh(newPage+1,this.props.rowsPerPage)
-        }
-        else{
-            this.props.setLastPage('implementation')
-        }
-
-        */
-        //this.setState({page:newPage})
 
     }
 
@@ -301,7 +306,17 @@ class SurveyImplementationComponent extends Component {
                                 />
                     </Grid>
 
-                    <Grid item xs={3}>
+                    <Grid item xs={2}>
+                        <Select className={classes.marginTops}
+                            options={this.state.periodeOptions}
+                            value={this.state.filterPeriode}
+                            onChange={this.filterPeriodeChange}
+                            placeholder='Filter periode'
+                            isClearable={true}
+                            />
+                    </Grid>
+
+                    <Grid item xs={2}>
                         <TextField
                             id="filterOwner"
                             label="owner name"
@@ -317,7 +332,7 @@ class SurveyImplementationComponent extends Component {
                                 <SearchIcon fontSize='small'/>
                         </IconButton>
                     </Grid>
-                    <Grid item xs={5} >
+                    <Grid item xs={4} >
                             <Select className={classes.marginTops}
                                 options={filterTaskOptions}
                                 value={this.state.filterTask}
@@ -335,6 +350,7 @@ class SurveyImplementationComponent extends Component {
                 <TableHead>
                     <TableRow>
                         <TableCell align="center" className={classes.long}>Title</TableCell>
+                        <TableCell align="center" className={classes.long}>Periode</TableCell>
                         <TableCell align="center" className={classes.long}>Description</TableCell>
                         <TableCell align="center">Owner</TableCell>
                         <TableCell align="center" className={classes.widthDate}>Valid From</TableCell>
@@ -350,6 +366,7 @@ class SurveyImplementationComponent extends Component {
                         return (
                             <TableRow key={row.id}>
                             <TableCell align="left">{row.judul}</TableCell>
+                            <TableCell align="left">{row.periode}</TableCell>
                             <TableCell align="left">{row.description}</TableCell>
                             <TableCell align="left">{row.owner_name}</TableCell>
                             <TableCell align="center">{(!row.expired&&row.valid_from)||'expired'}</TableCell>

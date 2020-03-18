@@ -28,6 +28,7 @@ const DebouncedTextField = (props) => {
 
     return(
         <TextField
+        type={props.type?props.type:"text"}
         id={props.id}
         margin={props.margin}
         label={props.label}

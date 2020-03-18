@@ -231,8 +231,9 @@ const PaExternalDataCreateComponent = (props) =>{
                         {
                             selectedUnitOwner.map(unit=>(
                                 <Grid item container spacing={8} className={classes.marginTops}>
-                                    <Grid item xs={6}>
+                                    <Grid item xs={3}>
                                         <DebouncedTextField
+                                        type="number"
                                         id={unit.value}
                                         key_id_1={unit.value}
                                         fullWidth
